@@ -31,7 +31,7 @@ object ScalaTweetAnalysis7 {
     val authorization=new OAuthAuthorization(confBuild.build)
     val tweetsDownload= TwitterUtils.createStream(ssc, Some(authorization))
     val filterTweetsLan= tweetsDownload.filter(_.getLang() == "en")
-    filterTweetsLan.saveAsTextFiles("/home/andrea/IdeaProjects/ScalaSpark-TweetAnalysis/OUT/tweets", "json")
+    filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
     ssc.start()
     ssc.awaitTermination()
   }

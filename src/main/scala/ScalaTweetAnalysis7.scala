@@ -9,12 +9,6 @@ object ScalaTweetAnalysis7 {
 
   def main(args: Array[String]) {
 
-    //    val consumerKey="2tcPwirFJ9NZJxqt2risSbXYB"
-    //    val consumerKeySecret="NhP3ZY6iuszeOKHEHHKkUUYVWUtKF2ga4Xy7BuW1dOWFI5YRpd"
-    //    val accessToken="1073515508593541120-p2GCgSJ0K6NgieTh0Z6JxubPv5Ig7L"
-    //    val accessTokenSecret="OVPFFMjOnWQ8LcAyLnJutPuncvSbcLgWC7WTKjSS6oeaA"
-
-
     if (args.length < 4) {
       System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
       System.exit(1)

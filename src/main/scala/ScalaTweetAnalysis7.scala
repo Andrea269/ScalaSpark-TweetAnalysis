@@ -8,15 +8,17 @@ import twitter4j.conf.ConfigurationBuilder
 object ScalaTweetAnalysis7 {
 
   def main(args: Array[String]) {
-    downloadTweet(args)
 
-  }
-
-  def downloadTweet(args: Array[String]): Unit ={
     if (args.length < 4) {
       System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
       System.exit(1)
     }
+
+    downloadTweet(args)
+    textExtraction()
+  }
+
+  def downloadTweet(args: Array[String]): Unit ={
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
     val filters = args.takeRight(args.length - 4)
 
@@ -35,5 +37,21 @@ object ScalaTweetAnalysis7 {
   }
 
 
+  def textExtraction(): Unit ={
 
+  }
+
+  /*
+  ipotizza l'output contenuto in un file dove hai:
+   1 tweet
+   ./.
+   1 tweet
+   ./.
+   1 tweet
+   ./.
+   1 tweet
+   */
+  def sentimentAnalysis(): Unit ={
+
+  }
 }

@@ -4,6 +4,11 @@ version := "0.1"
 
 scalaVersion := "2.11.8"
 
+
+libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" artifacts (Artifact("stanford-corenlp", "models"), Artifact("stanford-corenlp"))
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+
+
 // https://mvnrepository.com/artifact/org.twitter4j/twitter4j-core
 libraryDependencies += "org.twitter4j" % "twitter4j-core" % "4.0.7"
 

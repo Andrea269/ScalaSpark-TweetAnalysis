@@ -39,6 +39,8 @@ object ScalaTweetAnalysis7 {
     val tweetsDownload= TwitterUtils.createStream(ssc, Some(authorization))
     val filterTweetsLan= tweetsDownload.filter(_.getLang() == "en")
 
+    //      filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
+
     filterTweetsLan.foreachRDD{(rdd, time) =>
       rdd.map(t => {
         Map(
@@ -47,6 +49,7 @@ object ScalaTweetAnalysis7 {
           "created_at" -> t.getCreatedAt.toInstant.toString,
           "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
           "text" -> t.getText,
+          "sentiment" -> mainSentiment(t.getText),
           "hashtags" -> t.getHashtagEntities.map(_.getText),//if vuoto modificare
           "retweet" -> t.getRetweetCount
         )
@@ -54,10 +57,28 @@ object ScalaTweetAnalysis7 {
         .saveAsTextFile("OUT/tweets")
 //        .persist()
     }
-//      filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
+
+
+    //PROVA
+//    filterTweetsLan.foreachRDD{rdd=> rdd.map (t => {
+//      Map(
+//        t.getId->Map(
+//          "user"-> t.getUser.getScreenName,
+//          "created_at" -> t.getCreatedAt.toInstant.toString,
+//          "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
+//          "text" -> t.getText,
+//          "hashtags" -> t.getHashtagEntities.map(_.getText),//if vuoto modificare
+//          "retweet" -> t.getRetweetCount
+//        )
+//      )
+//    })
+//      .saveAsTextFile("OUT/tweets")
+//      //        .persist()
+//    }
+
 
     ssc.start()
-    ssc.awaitTerminationOrTimeout(7000)
+    ssc.awaitTerminationOrTimeout(27000)
   }
 
   val props = new Properties()

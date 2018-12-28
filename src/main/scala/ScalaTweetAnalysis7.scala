@@ -8,7 +8,11 @@ import twitter4j.conf.ConfigurationBuilder
 object ScalaTweetAnalysis7 {
 
   def main(args: Array[String]) {
+    downloadTweet(args)
 
+  }
+
+  def downloadTweet(args: Array[String]): Unit ={
     if (args.length < 4) {
       System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
       System.exit(1)
@@ -27,6 +31,9 @@ object ScalaTweetAnalysis7 {
     val filterTweetsLan= tweetsDownload.filter(_.getLang() == "en")
     filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
     ssc.start()
-    ssc.awaitTermination()
+    ssc.awaitTerminationOrTimeout(24000)
   }
+
+
+
 }

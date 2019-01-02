@@ -33,31 +33,35 @@ object ScalaTweetAnalysis7 {
 
     // Create the context with a 5 second batch size
 
-    val ssc = new StreamingContext(sparkConf, Seconds(5))
+    //crea il contesto di streaming ed imposta un intervallo di tot secondi
+    val ssc = new StreamingContext(sparkConf, Seconds(15))
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
     val authorization = new OAuthAuthorization(confBuild.build)
 
-    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization))
+    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization), Array("#NBA", "@NBA", "@nba", "@nba"))
     val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en")
 
-    //      filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
+//          filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
 
+    //hastag
 
 //    filterTweetsLan.persist() //????
 
     filterTweetsLan.foreachRDD { rdd =>
       rdd.map(t => (t.getId,
         Map(
-          "text" -> t.getText,
+          "text" -> t.getText, // todo parte del testo dei tweet troppo lunghi viene troncato
           "user" -> t.getUser.getScreenName,
           "created_at" -> t.getCreatedAt.toInstant.toString,
           "location" -> Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"}),
-          "hashtags" -> t.getHashtagEntities.map(_.getText), //if vuoto modificare
-          "retweet" -> t.getRetweetCount
+          "retweet" -> t.getRetweetCount,
+          "hashtags" -> t.getHashtagEntities.map(_.getText) //if vuoto modificare
+
+
         )
       ))
-        .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
+        //.groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
         .map(t=> (t._1, computesSentiment(t._2.get("text").toString), t._2 ) )
         .saveAsTextFile("OUT/tweets")
 //        .persist()
@@ -65,25 +69,25 @@ object ScalaTweetAnalysis7 {
 
 
     //origin
-    //    filterTweetsLan.foreachRDD{rdd =>
-    //      rdd.map(t => {
-    //        Map(
-    //          "id"-> t.getId,
-    //          "user"-> t.getUser.getScreenName,
-    //          "created_at" -> t.getCreatedAt.toInstant.toString,
-    //          "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
-    //          "text" -> t.getText,
-    //          "sentiment" -> computesSentiment(t.getText),
-    //          "hashtags" -> t.getHashtagEntities.map(_.getText),//if vuoto modificare
-    //          "retweet" -> t.getRetweetCount
-    //        )
-    //      })
-    //        .saveAsTextFile("OUT/tweets")
-    //      //        .persist()
-    //    }
+//        filterTweetsLan.foreachRDD{rdd =>
+//          rdd.map(t => {
+//            Map(
+//              "id"-> t.getId,
+//              "user"-> t.getUser.getScreenName,
+//              "created_at" -> t.getCreatedAt.toInstant.toString,
+//              "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
+//              "text" -> t.getText,
+//              "sentiment" -> computesSentiment(t.getText),
+//              "hashtags" -> t.getHashtagEntities.map(_.getText),//if vuoto modificare
+//              "retweet" -> t.getRetweetCount
+//            )
+//          })
+//            .saveAsTextFile("OUT/tweets")
+//          //        .persist()
+//        }
 
     ssc.start()
-    ssc.awaitTerminationOrTimeout(12000)
+    ssc.awaitTerminationOrTimeout(120000) //2 min
   }
 
   val props = new Properties()

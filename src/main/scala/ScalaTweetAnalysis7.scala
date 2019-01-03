@@ -31,27 +31,31 @@ object ScalaTweetAnalysis7 {
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
     val filters = args.takeRight(args.length - 4)
 
-    // Create the context with a 5 second batch size
+    filters.foreach(t => ("#" + t, "@" + t))
 
-    //crea il contesto di streaming ed imposta un intervallo di tot secondi
+    //crea il contesto di streaming con un intervallo di 15 secondi
     val ssc = new StreamingContext(sparkConf, Seconds(15))
+
+    //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
+
+    //crea struttura di autenticazione
     val authorization = new OAuthAuthorization(confBuild.build)
 
-    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization), Array("#NBA", "@NBA", "@nba", "@nba"))
+    //crea lo stream per scaricare i tweet
+    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization), filters)
+    //filtra solo i tweet in lingua inglese
     val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en")
 
-//          filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
+//    filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
 
-    //hastag
+//    filterTweetsLan.persist()
 
-//    filterTweetsLan.persist() //????
-
-    filterTweetsLan.foreachRDD { rdd =>
+    filterTweetsLan.foreachRDD { rdd => //crea rdd con triple formate da id del tweet, sentimento e mappa con le sue info
       rdd.map(t => (t.getId,
         Map(
-          "text" -> t.getText, // todo parte del testo dei tweet troppo lunghi viene troncato
+          "text" -> t.getText, // parte del testo dei tweet viene troncato
           "user" -> t.getUser.getScreenName,
           "created_at" -> t.getCreatedAt.toInstant.toString,
           "location" -> Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"}),
@@ -61,9 +65,9 @@ object ScalaTweetAnalysis7 {
 
         )
       ))
-        //.groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t=> (t._1, computesSentiment(t._2.get("text").toString), t._2 ) )
-        .saveAsTextFile("OUT/tweets")
+        .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
+        .map(t=> (t._1, computesSentiment(t._2.get("text").toString), t._2 ) )//calcola e aggiunge alla struttura il sentimento del testo del tweet
+        .saveAsTextFile("OUT/tweets")//salva su file i tweet
 //        .persist()
     }
 
@@ -86,8 +90,12 @@ object ScalaTweetAnalysis7 {
 //          //        .persist()
 //        }
 
+    //avvia lo stream e la computazione dei tweet
     ssc.start()
-    ssc.awaitTerminationOrTimeout(120000) //2 min
+
+    //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
+    ssc.awaitTerminationOrTimeout(60000)
+//    ssc.awaitTerminationOrTimeout(120000) //2 min
   }
 
   val props = new Properties()

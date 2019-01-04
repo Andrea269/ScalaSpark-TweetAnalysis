@@ -15,22 +15,44 @@ import twitter4j.conf.ConfigurationBuilder
 import scala.collection.convert.wrapAll._
 
 object ScalaTweetAnalysis7 {
+  /**
+    * I parametri passati devono essere separati da una tabulazione
+    * È obbligatorio passare le 4 chiavi di accesso per far eseguire l'applicativo
+      * consumerKey
+      * consumerKeySecret
+      * accessToken
+      * accessTokenSecret
+    *
+    * Dopo aver inserito le chiavi è possibile passare anche un insieme di stringhe
+    * rappresentanti i filtri da applicare al download dei tweet
+    * @param args
+    */
   def main(args: Array[String]) {
 
+    //controlla che almeno le 4 chiavi di accesso siano state passate come parametro al programma
     if (args.length < 4) {
       System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
       System.exit(1)
     }
+
+    //configura spark
     val sparkConf = new SparkConf()
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[3]")
 
+    //avvia il download e il salvataggio dei tweet
     downloadTweet(sparkConf, args)
   }
 
+  /**
+    *
+    * @param sparkConf
+    * @param args
+    */
   def downloadTweet(sparkConf: SparkConf, args: Array[String]): Unit = {
+    //leggo dai parametri passati dall'utente le 4 chiavi twitter
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
+    //leggo dai parametri passati dall'utente i filtri da applicare al downloaddei tweet
     val filters = args.takeRight(args.length - 4)
-
     filters.foreach(t => ("#" + t, "@" + t))
 
     //crea il contesto di streaming con un intervallo di 15 secondi
@@ -50,69 +72,66 @@ object ScalaTweetAnalysis7 {
 
 //    filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
 
-//    filterTweetsLan.persist()
-
     filterTweetsLan.foreachRDD { rdd => //crea rdd con triple formate da id del tweet, sentimento e mappa con le sue info
-      rdd.map(t => (t.getId,
+      rdd.map(t =>(
+        //id del tweet
+        t.getId,
+        //testo del tweet condizione necessaria poichè se retweet il testo viene troncato
+        (if (t.getRetweetedStatus!=null) t.getRetweetedStatus.getText else t.getText,
         Map(
-          "text" -> t.getText, // parte del testo dei tweet viene troncato
           "user" -> t.getUser.getScreenName,
           "created_at" -> t.getCreatedAt.toInstant.toString,
           "location" -> Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"}),
           "retweet" -> t.getRetweetCount,
           "hashtags" -> t.getHashtagEntities.map(_.getText) //if vuoto modificare
-
-
         )
-      ))
+      )))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t=> (t._1, computesSentiment(t._2.get("text").toString), t._2 ) )//calcola e aggiunge alla struttura il sentimento del testo del tweet
+        .map(t=> (t._1, computesSentiment(t._2._1.toString), t._2 ) )//calcola e aggiunge alla struttura il sentimento del testo del tweet
         .saveAsTextFile("OUT/tweets")//salva su file i tweet
 //        .persist()
     }
-
-
-    //origin
-//        filterTweetsLan.foreachRDD{rdd =>
-//          rdd.map(t => {
-//            Map(
-//              "id"-> t.getId,
-//              "user"-> t.getUser.getScreenName,
-//              "created_at" -> t.getCreatedAt.toInstant.toString,
-//              "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
-//              "text" -> t.getText,
-//              "sentiment" -> computesSentiment(t.getText),
-//              "hashtags" -> t.getHashtagEntities.map(_.getText),//if vuoto modificare
-//              "retweet" -> t.getRetweetCount
-//            )
-//          })
-//            .saveAsTextFile("OUT/tweets")
-//          //        .persist()
-//        }
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
 
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(60000)
+    ssc.awaitTerminationOrTimeout(35000)
 //    ssc.awaitTerminationOrTimeout(120000) //2 min
   }
 
+
+  //sentiment
   val props = new Properties()
   props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
   val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
 
+  /**
+    *
+    * @param input
+    * @return
+    */
   def computesSentiment(input: String): Sentiment = Option(input) match {
     case Some(text) if !text.isEmpty => extractSentiment(text)
     case _ => throw new IllegalArgumentException("input can't be null or empty")
   }
 
+  /**
+    *
+    * @param text
+    * @return
+    */
   private def extractSentiment(text: String): Sentiment = {
     val (_, sentiment) = extractSentiments(text)
       .maxBy { case (sentence, _) => sentence.length }
     sentiment
   }
 
+  /**
+    *
+    * @param text
+    * @return
+    */
   def extractSentiments(text: String): List[(String, Sentiment)] = {
     val annotation: Annotation = pipeline.process(text)
     val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])

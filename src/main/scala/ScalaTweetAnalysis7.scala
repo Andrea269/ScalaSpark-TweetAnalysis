@@ -18,13 +18,14 @@ object ScalaTweetAnalysis7 {
   /**
     * I parametri passati devono essere separati da una tabulazione
     * È obbligatorio passare le 4 chiavi di accesso per far eseguire l'applicativo
-      * consumerKey
-      * consumerKeySecret
-      * accessToken
-      * accessTokenSecret
+    * consumerKey
+    * consumerKeySecret
+    * accessToken
+    * accessTokenSecret
     *
     * Dopo aver inserito le chiavi è possibile passare anche un insieme di stringhe
     * rappresentanti i filtri da applicare al download dei tweet
+    *
     * @param args
     */
   def main(args: Array[String]) {
@@ -53,7 +54,6 @@ object ScalaTweetAnalysis7 {
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
     //leggo dai parametri passati dall'utente i filtri da applicare al downloaddei tweet
     val filters = args.takeRight(args.length - 4)
-    filters.foreach(t => ("#" + t, "@" + t))
 
     //crea il contesto di streaming con un intervallo di 15 secondi
     val ssc = new StreamingContext(sparkConf, Seconds(15))
@@ -70,25 +70,26 @@ object ScalaTweetAnalysis7 {
     //filtra solo i tweet in lingua inglese
     val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en")
 
-//    filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
+    //    filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
 
     filterTweetsLan.foreachRDD { rdd => //crea rdd con triple formate da id del tweet, sentimento e mappa con le sue info
-      rdd.map(t =>(
+      rdd.map(t => (
         //id del tweet
         t.getId,
         //testo del tweet condizione necessaria poichè se retweet il testo viene troncato
-        (if (t.getRetweetedStatus!=null) t.getRetweetedStatus.getText else t.getText,
-        Map(
-          "user" -> t.getUser.getScreenName,
-          "created_at" -> t.getCreatedAt.toInstant.toString,
-          "location" -> Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"}),
-          "retweet" -> t.getRetweetCount,
-          "hashtags" -> t.getHashtagEntities.map(_.getText) //if vuoto modificare
-        )
-      )))
+        (if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText,
+          Map(
+            "user" -> t.getUser.getScreenName,
+            "created_at" -> t.getCreatedAt.toInstant.toString
+            //,"location" -> Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"}),
+            //"retweet" -> t.getRetweetCount,
+            //"hashtags" -> t.getHashtagEntities.map(_.getText) //if vuoto modificare
+          )
+        )))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t=> (t._1, computesSentiment(t._2._1.toString), t._2 ) )//calcola e aggiunge alla struttura il sentimento del testo del tweet
-        .saveAsTextFile("OUT/tweets")//salva su file i tweet
+        .map(t => (t._1, computesSentiment(t._2._1.toString), t._2)) //calcola e aggiunge alla struttura il sentimento del testo del tweet
+
+                .saveAsTextFile("OUT/tweets")//salva su file i tweet
 //        .persist()
     }
 
@@ -97,7 +98,8 @@ object ScalaTweetAnalysis7 {
 
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
     ssc.awaitTerminationOrTimeout(35000)
-//    ssc.awaitTerminationOrTimeout(120000) //2 min
+    //    ssc.awaitTerminationOrTimeout(300000) //2 min
+
   }
 
 
@@ -141,3 +143,9 @@ object ScalaTweetAnalysis7 {
       .toList
   }
 }
+
+//todo estrarre hashtag # e tag @
+//todo libreria grafica
+
+//todo computazione cumulativa agiornata ad ogni download
+//todo count

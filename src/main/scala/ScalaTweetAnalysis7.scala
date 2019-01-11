@@ -38,7 +38,7 @@ object ScalaTweetAnalysis7 {
 
     //configura spark
     val sparkConf = new SparkConf()
-    sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[3]")
+    sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
 
     //avvia il download e il salvataggio dei tweet
     downloadTweet(sparkConf, args)

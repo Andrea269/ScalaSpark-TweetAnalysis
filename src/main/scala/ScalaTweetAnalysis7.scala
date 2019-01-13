@@ -40,6 +40,9 @@ object ScalaTweetAnalysis7 {
     val sparkConf = new SparkConf()
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
 
+
+//    val out= extractHashtags("ciao#ciao #1 dd # dd d# #2ciao # s #3sss")
+//    out.foreach(println)
     //avvia il download e il salvataggio dei tweet
     downloadTweet(sparkConf, args)
   }
@@ -70,38 +73,55 @@ object ScalaTweetAnalysis7 {
     //filtra solo i tweet in lingua inglese
     val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en")
 
-    //    filterTweetsLan.saveAsTextFiles("OUT/tweets", "json")
+//    filterTweetsLan.saveAsTextFiles("OUT/ALTROtweets")
 
-    filterTweetsLan.foreachRDD { rdd => //crea rdd con triple formate da id del tweet, sentimento e mappa con le sue info
+    filterTweetsLan.foreachRDD { rdd => //crea rdd con coppie formate da id del tweet e una mappa con le sue info
       rdd.map(t => (
-        //id del tweet
-        t.getId,
-        //testo del tweet condizione necessaria poichè se retweet il testo viene troncato
-        (if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText,
-          Map(
-            "user" -> t.getUser.getScreenName,
-            "created_at" -> t.getCreatedAt.toInstant.toString
-            //,"location" -> Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"}),
-            //"retweet" -> t.getRetweetCount,
-            //"hashtags" -> t.getHashtagEntities.map(_.getText) //if vuoto modificare
-          )
-        )))
+        t.getId,//id del tweet
+        (
+          //testo del tweet condizione necessaria poichè se retweet il testo viene troncato
+          if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText,//t._2._1
+          t.getUser.getScreenName,//t._2._2
+          t.getCreatedAt.toInstant.toString//t._2._3
+//          ,Option(t.getGeoLocation).map(geo => {s"${geo.getLatitude},${geo.getLongitude}"})//t._2._4
+//          ,t.getRetweetCount//t._2._5
+        )
+      ))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t => (t._1, computesSentiment(t._2._1.toString), t._2)) //calcola e aggiunge alla struttura il sentimento del testo del tweet
+        .map(t => (t._1,
 
-                .saveAsTextFile("OUT/tweets")//salva su file i tweet
-//        .persist()
+        Map(
+          "sentiment" -> computesSentiment(t._2._1.toString),
+          "text" -> t._2._1.toString,
+          "hashtags" -> extractHashtags(t._2._1.toString),
+          "user" -> t._2._2,
+          "created_at" -> t._2._3
+//          ,"location" -> t._2._4
+//          ,"retweet" -> t._2._5
+        )
+      )) //calcola e aggiunge alla struttura il sentimento del testo del tweet
+        .saveAsTextFile("OUT/tweets") //salva su file i tweet
+      //        .persist()
     }
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
 
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(35000)
-    //    ssc.awaitTerminationOrTimeout(300000) //2 min
+    ssc.awaitTerminationOrTimeout(25000)
+//        ssc.awaitTerminationOrTimeout(300000) //2 min
 
   }
 
+  def extractHashtags(input: String): String = {
+    if (input == null) "" else
+    input.split("\\s+")//(' ')|('\n')|('\t')|('\r')
+      .filter(p => p(0).toString.equals("#") && p.length > 1)
+      .foldLeft("")((x,y)=>x+" "+y)//serve solo per trasformare in un unica stringa
+
+//        listHashtag.foreach(println)
+
+  }
 
   //sentiment
   val props = new Properties()
@@ -144,8 +164,7 @@ object ScalaTweetAnalysis7 {
   }
 }
 
-//todo estrarre hashtag # e tag @
 //todo libreria grafica
 
-//todo computazione cumulativa agiornata ad ogni download
+//todo computazione cumulativa aggiornata ad ogni download
 //todo count

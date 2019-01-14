@@ -28,14 +28,21 @@ object TweetStruc {
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String): String = {
     tweet = new TweetClass(idT, textT, userT, createdT)
-    tweet.toString
+    this.toString("Tweet:")
   }
 
   /**
     *
-     * @return
+    * @return
     */
   override def toString: String = tweet.toString
+
+  /**
+    *
+    * @param heading
+    * @return
+    */
+  def toString(heading: String): String = heading+this.toString
 
   /**
     *
@@ -48,9 +55,9 @@ object TweetStruc {
     private val id: Long = idT
 
     private val textTweet: String = textT.toString
-
+println(textTweet)
     private val sentimentTweet: String = textTweet
-//    private val sentimentTweet: Sentiment = computesSentiment(textT.toString)
+//    private val sentimentTweet: Sentiment = computesSentiment(textTweet)
 
     //calcola il sentimento del testo del tweet
     private val hashtags: Array[String] = extractHashtags(textT.toString)
@@ -125,7 +132,8 @@ object TweetStruc {
       * @return
       */
     override def toString: String = {
-      id + " " + textTweet + " " + sentimentTweet + " " + hashtags.foldLeft("")((x, y) => x + " " + y) + " " + user + " " + created_at
+      "ID->"+id + ", Text->" + textTweet + ", Sentiment->" + sentimentTweet +
+        ", Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + ", User->" + user + ", Time->" + created_at
     }
   }
 

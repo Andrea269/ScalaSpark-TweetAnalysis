@@ -24,7 +24,6 @@ object ScalaTweetAnalysis7 {
 
     //avvia il download e il salvataggio dei tweet
     downloadTweet(sparkConf, args)
-//        println(TweetStruc.tweetStuct(12345,"ciao bella gente #ci #ff #e", "c", "sad"))
   }
 
   /**

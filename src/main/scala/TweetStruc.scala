@@ -12,14 +12,38 @@ import scala.collection.convert.wrapAll._
 object TweetStruc {
   private var tweet: TweetClass = null
 
+  /**
+    *
+    * @return object tweet
+    */
   def getTweet: TweetClass= tweet
+
+  /**
+    *
+    * @param idT
+    * @param textT
+    * @param userT
+    * @param createdT
+    * @return
+    */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String): String = {
     tweet = new TweetClass(idT, textT, userT, createdT)
     tweet.toString
   }
 
+  /**
+    *
+     * @return
+    */
   override def toString: String = tweet.toString
 
+  /**
+    *
+    * @param idT
+    * @param textT
+    * @param userT
+    * @param createdT
+    */
   class TweetClass(idT: Long, textT: String, userT: String, createdT: String) {
     private val id: Long = idT
 
@@ -96,6 +120,10 @@ object TweetStruc {
           .filter(p => p(0).toString.equals("#") && p.length > 1) //seleziona gli hashtag
     }
 
+    /**
+      *
+      * @return
+      */
     override def toString: String = {
       id + " " + textTweet + " " + sentimentTweet + " " + hashtags.foldLeft("")((x, y) => x + " " + y) + " " + user + " " + created_at
     }

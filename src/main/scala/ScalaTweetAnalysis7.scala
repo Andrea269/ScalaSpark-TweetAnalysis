@@ -1,18 +1,8 @@
-
-import java.util.Properties
-
-import Sentiment.Sentiment
-import edu.stanford.nlp.ling.CoreAnnotations
-import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
-import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
-import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
-
-import scala.collection.convert.wrapAll._
 
 object ScalaTweetAnalysis7 {
   /**
@@ -40,11 +30,10 @@ object ScalaTweetAnalysis7 {
     val sparkConf = new SparkConf()
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
 
-
-//    val out= extractHashtags("ciao#ciao #1 dd # dd d# #2ciao # s #3sss")
-//    out.foreach(println)
     //avvia il download e il salvataggio dei tweet
-    downloadTweet(sparkConf, args)
+
+        downloadTweet(sparkConf, args)
+//    println(TweetStruc.tweetStuct(12345,"ciao bella gente #ci #ff #e", "c", "sad"))
   }
 
   /**
@@ -73,7 +62,7 @@ object ScalaTweetAnalysis7 {
     //filtra solo i tweet in lingua inglese
     val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en")
 
-//    filterTweetsLan.saveAsTextFiles("OUT/ALTROtweets")
+    filterTweetsLan.saveAsTextFiles("OUT/ALTROtweets")
 
     filterTweetsLan.foreachRDD { rdd => //crea rdd con coppie formate da id del tweet e una mappa con le sue info
       rdd.map(t => (
@@ -88,18 +77,19 @@ object ScalaTweetAnalysis7 {
         )
       ))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t => (t._1,
-
-        Map(
-          "sentiment" -> computesSentiment(t._2._1.toString),
-          "text" -> t._2._1.toString,
-          "hashtags" -> extractHashtags(t._2._1.toString),
-          "user" -> t._2._2,
-          "created_at" -> t._2._3
-//          ,"location" -> t._2._4
-//          ,"retweet" -> t._2._5
-        )
-      )) //calcola e aggiunge alla struttura il sentimento del testo del tweet
+//        .map(t => (t._1,
+//
+//        Map(
+//          "sentiment" -> computesSentiment(t._2._1.toString),//calcola e aggiunge alla struttura il sentimento del testo del tweet
+//          "text" -> t._2._1.toString,
+//          "hashtags" -> extractHashtags(t._2._1.toString),//estrae e aggiunge alla struttura gli hashtag del testo del tweet
+//          "user" -> t._2._2,
+//          "created_at" -> t._2._3
+////          ,"location" -> t._2._4
+////          ,"retweet" -> t._2._5
+//        )
+//      ))
+        .map(t => TweetStruc.tweetStuct(t._1, t._2._1, t._2._2, t._2._3))
         .saveAsTextFile("OUT/tweets") //salva su file i tweet
       //        .persist()
     }
@@ -108,59 +98,8 @@ object ScalaTweetAnalysis7 {
     ssc.start()
 
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(25000)
+    ssc.awaitTerminationOrTimeout(35000)
 //        ssc.awaitTerminationOrTimeout(300000) //2 min
-
-  }
-
-  def extractHashtags(input: String): String = {
-    if (input == null) "" else
-    input.split("\\s+")//(' ')|('\n')|('\t')|('\r')
-      .filter(p => p(0).toString.equals("#") && p.length > 1)
-      .foldLeft("")((x,y)=>x+" "+y)//serve solo per trasformare in un unica stringa
-
-//        listHashtag.foreach(println)
-
-  }
-
-  //sentiment
-  val props = new Properties()
-  props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
-  val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
-
-  /**
-    *
-    * @param input
-    * @return
-    */
-  def computesSentiment(input: String): Sentiment = Option(input) match {
-    case Some(text) if !text.isEmpty => extractSentiment(text)
-    case _ => throw new IllegalArgumentException("input can't be null or empty")
-  }
-
-  /**
-    *
-    * @param text
-    * @return
-    */
-  private def extractSentiment(text: String): Sentiment = {
-    val (_, sentiment) = extractSentiments(text)
-      .maxBy { case (sentence, _) => sentence.length }
-    sentiment
-  }
-
-  /**
-    *
-    * @param text
-    * @return
-    */
-  def extractSentiments(text: String): List[(String, Sentiment)] = {
-    val annotation: Annotation = pipeline.process(text)
-    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
-    sentences
-      .map(sentence => (sentence, sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
-      .map { case (sentence, tree) => (sentence.toString, Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
-      .toList
   }
 }
 

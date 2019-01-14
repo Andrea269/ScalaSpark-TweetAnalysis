@@ -1,4 +1,3 @@
-
 object Sentiment extends Enumeration {
   type Sentiment = Value
   val POSITIVE, NEGATIVE, VERY_POSITIVE, VERY_NEGATIVE, NEUTRAL = Value

@@ -61,8 +61,8 @@ object ScalaTweetAnalysis7 {
 
     ssc.start()//avvia lo stream e la computazione dei tweet
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(35000)
-    //        ssc.awaitTerminationOrTimeout(300000) //2 min
+    ssc.awaitTerminationOrTimeout(40000)
+    //        ssc.awaitTerminationOrTimeout(120000) //2 min
   }
 }
 

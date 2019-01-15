@@ -47,8 +47,11 @@ object TweetStruc {
 
     private val id: Long = idT
     private val textTweet: String = textT.toString
-    val sentimentTweet: Sentiment = computesSentiment(textTweet) //calcola il sentimento del testo del tweet
-    private val hashtags: Array[String] = extractHashtags(textTweet) //estrae gli hashtag del testo del tweet
+    private val textTweetDeleteLink: String = cleanText(textT.toString)
+    val sentimentTweet: Sentiment = computesSentiment(textT.toString) //calcola il sentimento del testo del tweet
+    val sentimentTweetClean: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
+    private val hashtags: Array[String] = extractHashtags(textT.toString) //estrae gli hashtag del testo del tweet
+    private val listUserMentioned: Array[String] = userMentioned(textT.toString)
     private val user: String = userT.toString
     private val created_at: String = createdT.toString
 
@@ -114,9 +117,43 @@ object TweetStruc {
       * @return
       */
     private def extractHashtags(input: String): Array[String] = {
+      extractText(input, "#")
+    }
+
+    /**
+      *
+      * @param input
+      * @return
+      */
+    private def userMentioned(input: String): Array[String] = {
+      extractText(input, "@")
+    }
+
+
+    /**
+      *
+      * @param input
+      * @param heading
+      * @return
+      */
+    private def extractText(input: String, heading: String): Array[String] = {
       if (input == null) Array(" ") else
         input.split("\\s+") //(' ')|('\n')|('\t')|('\r')
-          .filter(p => p(0).toString.equals("#") && p.length > 1) //seleziona gli hashtag
+          .filter(p => p(0).toString.equals(heading) && p.length > 1) //seleziona gli hashtag
+    }
+
+    /**
+      * elimina link, hashtag e utenti menzionati
+      * @param input
+      * @return
+      */
+    private def cleanText(input: String): String = {
+      if (input == null) " " else
+        input.split("\\s+") //(' ')|('\n')|('\t')|('\r')
+          .filterNot(p => p.length>4 && p.take(4).toString.equals("http"))
+          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
+          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
+          .reduce((x,y)=>x + " " + y) //seleziona gli hashtag
     }
 
     /**
@@ -125,8 +162,14 @@ object TweetStruc {
       * @return
       */
     def toString(heading: String): String = heading +
-      "ID->" + id + ", Text->" + textTweet + ", Sentiment->" + sentimentTweet +
-      ", Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + ", User->" + user + ", Time->" + created_at
+      "ID->" + id + "\n"+
+      "Text->" + textTweet + "\n"+
+      "TextDeleteLink->" + textTweetDeleteLink+ "\n"+
+      "Sentiment->" + sentimentTweet + "\n"+
+      "SentimentTweetClean->" + sentimentTweetClean + "\n"+
+      "Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + "\n"+
+      "UserMentioned->" + listUserMentioned.foldLeft("")((x, y) => x + " " + y) + "\n"+
+      "User->" + user + ", Time->" + created_at + "\n\n\n"
   }
 
 }

@@ -17,7 +17,7 @@ object TweetStruc {
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String): String = {
     tweet = new TweetClass(idT, textT, userT, createdT)
-    tweet.toString("Tweet:")
+    tweet.toString("Tweet:\n")
   }
 
 
@@ -47,9 +47,7 @@ object TweetStruc {
 
     private val id: Long = idT
     private val textTweet: String = textT.toString
-    private val textTweetDeleteLink: String = cleanText(textT.toString)
-    val sentimentTweet: Sentiment = computesSentiment(textT.toString) //calcola il sentimento del testo del tweet
-    val sentimentTweetClean: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
+    val sentimentTweet: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
     private val hashtags: Array[String] = extractHashtags(textT.toString) //estrae gli hashtag del testo del tweet
     private val listUserMentioned: Array[String] = userMentioned(textT.toString)
     private val user: String = userT.toString
@@ -151,8 +149,8 @@ object TweetStruc {
       if (input == null) " " else
         input.split("\\s+") //(' ')|('\n')|('\t')|('\r')
           .filterNot(p => p.length>4 && p.take(4).toString.equals("http"))
-          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
-          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
+//          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
+//          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
           .reduce((x,y)=>x + " " + y) //seleziona gli hashtag
     }
 
@@ -164,9 +162,7 @@ object TweetStruc {
     def toString(heading: String): String = heading +
       "ID->" + id + "\n"+
       "Text->" + textTweet + "\n"+
-      "TextDeleteLink->" + textTweetDeleteLink+ "\n"+
       "Sentiment->" + sentimentTweet + "\n"+
-      "SentimentTweetClean->" + sentimentTweetClean + "\n"+
       "Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + "\n"+
       "UserMentioned->" + listUserMentioned.foldLeft("")((x, y) => x + " " + y) + "\n"+
       "User->" + user + ", Time->" + created_at + "\n\n\n"

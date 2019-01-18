@@ -44,17 +44,16 @@ object ScalaTweetAnalysis7 {
 
     val authorization = new OAuthAuthorization(confBuild.build)//crea struttura di autenticazione
     val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization), filters) //crea lo stream per scaricare i tweet
-    val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en") //filtra solo i tweet in lingua inglese todo
 
-    //    filterTwee/tsLan.saveAsTextFiles("OUT/ALTROtweets")
+        //tweetsDownload.saveAsTextFiles("OUT/ALTROtweets")
 
-    filterTweetsLan.foreachRDD { rdd => //crea rdd con coppie formate da id del tweet e una mappa con le sue info
+    tweetsDownload.foreachRDD { rdd => //crea rdd con coppie formate da id del tweet e una mappa con le sue info
       rdd.map(t => (
         t, //id del tweet
         if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText //t._2
       ))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString))
+        .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang))
         .saveAsTextFile("OUT/tweets") //salva su file i tweet
       //        .persist()
     }

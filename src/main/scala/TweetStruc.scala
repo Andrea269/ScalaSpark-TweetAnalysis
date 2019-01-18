@@ -15,8 +15,8 @@ object TweetStruc {
     * @param createdT
     * @return
     */
-  def tweetStuct(idT: Long, textT: String, userT: String, createdT: String): String = {
-    tweet = new TweetClass(idT, textT, userT, createdT)
+  def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String): String = {
+    tweet = new TweetClass(idT, textT, userT, createdT, langT)
     tweet.toString("Tweet:\n")
   }
 
@@ -35,7 +35,7 @@ object TweetStruc {
     * @param userT
     * @param createdT
     */
-  class TweetClass(idT: Long, textT: String, userT: String, createdT: String) {
+  class TweetClass(idT: Long, textT: String, userT: String, createdT: String, langT: String) {
 
     import java.util.Properties
     import edu.stanford.nlp.ling.CoreAnnotations
@@ -47,17 +47,20 @@ object TweetStruc {
 
     private val id: Long = idT
     private val textTweet: String = textT.toString
-    val sentimentTweet: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
     private val hashtags: Array[String] = extractHashtags(textT.toString) //estrae gli hashtag del testo del tweet
     private val listUserMentioned: Array[String] = userMentioned(textT.toString)
     private val user: String = userT.toString
     private val created_at: String = createdT.toString
+    private val lang: String = langT.toString
+
+    val sentimentTemp: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
+    val sentimentTweet: String = if (lang=="en") sentimentTemp.toString else "NEUTRAL" //calcola il sentimento del testo del tweet
 
     def getId: Long = id
 
     def getText: String = textTweet
 
-    def getSentiment: Sentiment = sentimentTweet
+    def getSentiment: String = sentimentTweet
 
     def getHashtags: Array[String] = hashtags
 
@@ -165,7 +168,8 @@ object TweetStruc {
       "Sentiment->" + sentimentTweet + "\n"+
       "Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + "\n"+
       "UserMentioned->" + listUserMentioned.foldLeft("")((x, y) => x + " " + y) + "\n"+
-      "User->" + user + ", Time->" + created_at + "\n\n\n"
+      "User->" + user + ", Time->" + created_at + "\n"+
+      "Language->"+lang+"\n\n\n"
   }
 
 }

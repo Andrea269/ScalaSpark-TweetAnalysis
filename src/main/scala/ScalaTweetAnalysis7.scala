@@ -3,6 +3,16 @@ import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
+import twitter4j.Status
+
+import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql._
+
+import java.io._
 
 object ScalaTweetAnalysis7 {
   /**
@@ -44,24 +54,45 @@ object ScalaTweetAnalysis7 {
 
     val authorization = new OAuthAuthorization(confBuild.build)//crea struttura di autenticazione
     val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization), filters) //crea lo stream per scaricare i tweet
-    val filterTweetsLan = tweetsDownload.filter(_.getLang() == "en") //filtra solo i tweet in lingua inglese todo
 
-    //    filterTwee/tsLan.saveAsTextFiles("OUT/ALTROtweets")
+    val data = tweetsDownload.map {status =>
+      //val places = status.getPlace
+      val id = status.getUser.getId
+      val date = status.getUser.getCreatedAt.toString()
+      val user = status.getUser.getName()
+      //val place = places.getCountry()
 
-    filterTweetsLan.foreachRDD { rdd => //crea rdd con coppie formate da id del tweet e una mappa con le sue info
-      rdd.map(t => (
-        t, //id del tweet
-        if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText //t._2
-      ))
-        .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString))
-        .saveAsTextFile("OUT/tweets") //salva su file i tweet
-      //        .persist()
+      //(id,date,user,place)
+      (id,date,user)
     }
+    val spark = SparkSession
+      .builder
+      .appName("twitter trying")
+      .getOrCreate()
+
+    data.foreachRDD{rdd =>
+      import spark.implicits._
+      val int = rdd.toDF("id","date","user","place").count()
+      println(int)
+    }
+
+    data.foreachRDD{rdd =>
+     rdd.collect.foreach(println)
+    }
+
+
+    /*// Read all the csv files written atomically in a directory
+    val userSchema = new StructType().add("name", "string").add("age", "integer")
+    val csvDF = spark
+    .readStream
+    .option("sep", ";")
+    .schema(userSchema)      // Specify schema of the csv files
+    .csv("/path/to/directory")    // Equivalent to format("csv").load("/path/to/directory")
+    */
 
     ssc.start()//avvia lo stream e la computazione dei tweet
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(40000)
+    ssc.awaitTerminationOrTimeout(10000)
     //        ssc.awaitTerminationOrTimeout(120000) //2 min
   }
 }

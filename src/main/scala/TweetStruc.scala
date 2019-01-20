@@ -1,5 +1,5 @@
 object TweetStruc {
-  private var tweet: TweetClass = null
+  private var tweet: TweetClass = _
 
   /**
     *
@@ -50,7 +50,7 @@ object TweetStruc {
     private val hashtags: Array[String] = extractHashtags(textT.toString) //estrae gli hashtag del testo del tweet
     private val listUserMentioned: Array[String] = userMentioned(textT.toString)
     private val user: String = userT.toString
-    private val created_at: String = createdT.toString
+    private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
     val sentimentTemp: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
@@ -66,7 +66,31 @@ object TweetStruc {
 
     def getUser: String = user
 
-    def getCreated_at: String = created_at
+    def getCreated_at: String = creationDate.toString()
+
+    /**
+      * Formato data: 2019-01-20T09:00:13Z
+      * @param date
+      * @return
+      */
+    def RefactoringDate(date: String):  Map[String, String] = {
+
+      var returnDate: Map[String, String] =null
+      val splitDate= date.substring(0, date.length-1).split("T")
+      val splitDay= splitDate(0).split("-")
+      val splitTime= splitDate(1).split(":")
+      if(splitDay!=null && splitTime!=null && splitDay.length==3 && splitTime.length==3){
+        returnDate=Map(
+          "Year"->splitDay(0),
+          "Month"->splitDay(1),
+          "Day"->splitDay(2),
+          "Hours"->splitTime(0),
+          "Minutes"->splitTime(1),
+          "Seconds"->splitTime(2)
+        )
+      }
+      returnDate
+    }
 
     def computesSentiment(input: String): Sentiment = {
       //sentiment
@@ -154,7 +178,7 @@ object TweetStruc {
           .filterNot(p => p.length>4 && p.take(4).toString.equals("http"))
 //          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
 //          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
-          .reduce((x,y)=>x + " " + y) //seleziona gli hashtag
+          .reduce((x,y)=>x + " " + y)
     }
 
     /**
@@ -168,7 +192,8 @@ object TweetStruc {
       "Sentiment->" + sentimentTweet + "\n"+
       "Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + "\n"+
       "UserMentioned->" + listUserMentioned.foldLeft("")((x, y) => x + " " + y) + "\n"+
-      "User->" + user + ", Time->" + created_at + "\n"+
+      "User->" + user + "\n"+
+      "Time->" + creationDate + "\n"+
       "Language->"+lang+"\n\n\n"
   }
 

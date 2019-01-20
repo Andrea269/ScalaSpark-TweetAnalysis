@@ -22,6 +22,7 @@ object ScalaTweetAnalysis7 {
     val sparkConf = new SparkConf()//configura spark
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
 
+//    println(TweetStruc.tweetStuct(1234567, "ciao ciao ciao #ciao @iao @@ #@ @#", "user", "2019-01-20T09:00:13Z", "en"))
     //avvia il download e il salvataggio dei tweet
     downloadTweet(sparkConf, args)
   }
@@ -60,8 +61,8 @@ object ScalaTweetAnalysis7 {
 
     ssc.start()//avvia lo stream e la computazione dei tweet
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(40000)
-    //        ssc.awaitTerminationOrTimeout(120000) //2 min
+    ssc.awaitTerminationOrTimeout(60000)//1 min
+//            ssc.awaitTerminationOrTimeout(300000) //5 min
   }
 }
 

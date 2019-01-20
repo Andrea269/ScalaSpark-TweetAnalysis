@@ -38,13 +38,13 @@ object ScalaTweetAnalysis7 {
     //leggo dai parametri passati dall'utente i filtri da applicare al downloaddei tweet
     val filters = args.takeRight(args.length - 4)
     //crea il contesto di streaming con un intervallo di 15 secondi
-    val ssc = new StreamingContext(sparkConf, Seconds(15))
+    val ssc = new StreamingContext(sparkConf, Seconds(10))
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
 
     val authorization = new OAuthAuthorization(confBuild.build)//crea struttura di autenticazione
-    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization), filters) //crea lo stream per scaricare i tweet
+    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization)) //crea lo stream per scaricare i tweet
 
         //tweetsDownload.saveAsTextFiles("OUT/ALTROtweets")
 

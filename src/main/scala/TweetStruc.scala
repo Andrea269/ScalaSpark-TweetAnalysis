@@ -53,9 +53,6 @@ object TweetStruc {
     private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
-//    val sentimentTemp: Sentiment = computesSentiment(cleanText(textT.toString)) //calcola il sentimento del testo del tweet
-//    val sentimentTweet: String = if (lang=="en") sentimentTemp.toString else "NEUTRAL" //calcola il sentimento del testo del tweet
-
     val sentimentTweet: String =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)).toString else "NEUTRAL" //calcola il sentimento del testo del tweet
     def getId: Long = id
 
@@ -94,8 +91,6 @@ object TweetStruc {
     }
 
     def computesSentiment(input: String): Sentiment = {
-      //sentiment
-//      var textInput=input
       val props = new Properties()
       props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
       val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
@@ -135,7 +130,6 @@ object TweetStruc {
           .toList
       }
 
-//      if(textInput==null) textInput=" "
       ExecutionComputesSentiment(input)
     }
 

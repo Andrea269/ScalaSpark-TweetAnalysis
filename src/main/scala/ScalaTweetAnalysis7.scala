@@ -7,30 +7,25 @@ import twitter4j.conf.ConfigurationBuilder
 object ScalaTweetAnalysis7 {
   /**
     *
-    * @param args
-      * consumerKey
-      * consumerKeySecret
-      * accessToken
-      * accessTokenSecret
-      * filter [Optional]
+    * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
     */
   def main(args: Array[String]) {
-    if (args.length < 4) {//controlla che almeno le 4 chiavi di accesso siano state passate come parametro al programma
+    if (args.length < 4) {
+      //controlla che almeno le 4 chiavi di accesso siano state passate come parametro al programma
       System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
       System.exit(1)
     }
-    val sparkConf = new SparkConf()//configura spark
+    val sparkConf = new SparkConf() //configura spark
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
 
-//    println(TweetStruc.tweetStuct(1234567, "ciao ciao ciao #ciao @iao @@ #@ @#", "user", "2019-01-20T09:00:13Z", "en"))
     //avvia il download e il salvataggio dei tweet
     downloadTweet(sparkConf, args)
   }
 
   /**
     *
-    * @param sparkConf
-    * @param args
+    * @param sparkConf variabile di configurazione di spark
+    * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
     */
   def downloadTweet(sparkConf: SparkConf, args: Array[String]): Unit = {
     //leggo dai parametri passati dall'utente le 4 chiavi twitter
@@ -42,28 +37,25 @@ object ScalaTweetAnalysis7 {
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
-
-    val authorization = new OAuthAuthorization(confBuild.build)//crea struttura di autenticazione
-    val tweetsDownload = TwitterUtils.createStream(ssc, Some(authorization)) //crea lo stream per scaricare i tweet
-
-        //tweetsDownload.saveAsTextFiles("OUT/ALTROtweets")
-
-    tweetsDownload.foreachRDD { rdd => //crea rdd con coppie formate da id del tweet e una mappa con le sue info
+    //crea struttura di autenticazione
+    val authorization = new OAuthAuthorization(confBuild.build)
+    //crea lo stream per scaricare i tweet applicando o meno un filtro
+    val tweetsDownload = if (args.length != 4) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
+    //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
+    tweetsDownload.foreachRDD { rdd =>
       rdd.map(t => (
-        t, //id del tweet
-        if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText //t._2
+        t, //tweet
+        if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText // testo del tweet
       ))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-        .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang))
+        .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
         .saveAsTextFile("OUT/tweets") //salva su file i tweet
       //        .persist()
     }
-
-    ssc.start()//avvia lo stream e la computazione dei tweet
+    //avvia lo stream e la computazione dei tweet
+    ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(60000)//1 min
-//            ssc.awaitTerminationOrTimeout(300000) //5 min
+    ssc.awaitTerminationOrTimeout(30000) //1 min
+    //            ssc.awaitTerminationOrTimeout(300000) //5 min
   }
 }
-
-//todo libreria grafica

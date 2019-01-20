@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
 
 
 // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-//libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.16"
+libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.16"
 
 
 assemblyShadeRules in assembly := Seq(

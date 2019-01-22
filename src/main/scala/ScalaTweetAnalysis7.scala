@@ -42,7 +42,8 @@ object ScalaTweetAnalysis7 {
     //crea struttura di autenticazione
     val authorization = new OAuthAuthorization(confBuild.build)
     //crea lo stream per scaricare i tweet applicando o meno un filtro
-    val tweetsDownload = if (args.length != 4) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
+
+    val tweetsDownload = if (args.length-1 != 4) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
 
     val spark = SparkSession
@@ -63,7 +64,7 @@ object ScalaTweetAnalysis7 {
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(60000) //1 min
+    ssc.awaitTerminationOrTimeout(20000) //1 min
     //            ssc.awaitTerminationOrTimeout(300000) //5 min
   }
 }

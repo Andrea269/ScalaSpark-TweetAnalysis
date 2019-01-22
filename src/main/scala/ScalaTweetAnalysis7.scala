@@ -25,7 +25,7 @@ object ScalaTweetAnalysis7 {
   /**
     *
     * @param sparkConf variabile di configurazione di spark
-    * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
+    * @param args      consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
     */
   def downloadTweet(sparkConf: SparkConf, args: Array[String]): Unit = {
     //leggo dai parametri passati dall'utente le 4 chiavi twitter
@@ -42,6 +42,7 @@ object ScalaTweetAnalysis7 {
     //crea lo stream per scaricare i tweet applicando o meno un filtro
     val tweetsDownload = if (args.length != 4) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
+
     tweetsDownload.foreachRDD { rdd =>
       rdd.map(t => (
         t, //tweet
@@ -49,13 +50,22 @@ object ScalaTweetAnalysis7 {
       ))
         .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
         .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-        .saveAsTextFile("OUT/tweets") //salva su file i tweet
+        .saveAsTextFile("OUT/tweets") //salva su file i tweet "OUT/tweets"
       //        .persist()
     }
+
+
+    /*
+    tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))//coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
+      .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
+      .foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
+    */
+
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(30000) //1 min
+    ssc.awaitTerminationOrTimeout(60000) //1 min
     //            ssc.awaitTerminationOrTimeout(300000) //5 min
   }
 }

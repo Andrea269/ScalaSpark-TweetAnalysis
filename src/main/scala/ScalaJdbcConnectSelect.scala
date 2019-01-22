@@ -12,10 +12,10 @@ object ScalaJdbcConnectSelect {
 
   // Create the JDBC URL without passing in the user and password parameters.
 
-  val driver = "cm.mysql.jdbc.Driver"
+  val driver = "com.mysql.jdbc.Driver"
   val url = s"jdbc:mysql://$jdbcHostname:$jdbcPort/$jdbcDatabase"
   val username = "root"
-  val password = "root"
+  val password = ""
 
   def main(args: Array[String]) {
     // connect to the database named "mysql" on the localhost

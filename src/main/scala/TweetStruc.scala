@@ -15,9 +15,10 @@ object TweetStruc {
     * @param createdT
     * @return
     */
-  def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String): String = {
+  def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String):
+  (Long, String, String, Array[String], Array[String], String, String, String) = {
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
-    tweet.toString("Tweet:\n")
+    (tweet.getId, tweet.getText, tweet.getSentiment, tweet.getHashtags, tweet.getUserMentioned, tweet.getUser, tweet.getCreated_at, tweet.getLanguage)
   }
 
 
@@ -62,9 +63,13 @@ object TweetStruc {
 
     def getHashtags: Array[String] = hashtags
 
+    def getUserMentioned: Array[String] = listUserMentioned
+
     def getUser: String = user
 
     def getCreated_at: String = creationDate.toString()
+
+    def getLanguage: String = langT
 
     /**
       * Formato data: 2019-01-20T09:00:13Z

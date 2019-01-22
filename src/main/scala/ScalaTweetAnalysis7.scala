@@ -42,8 +42,8 @@ object ScalaTweetAnalysis7 {
     //crea struttura di autenticazione
     val authorization = new OAuthAuthorization(confBuild.build)
     //crea lo stream per scaricare i tweet applicando o meno un filtro
-
-    val tweetsDownload = if (args.length-1 != 4) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
+    println(filters.length)
+    val tweetsDownload = if (filters.length>0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
 
     val spark = SparkSession
@@ -60,11 +60,12 @@ object ScalaTweetAnalysis7 {
       val countTweet= dataFrame.count()
       println("\n\n\n\nNumero Tweet " + countTweet +"\n\n\n")
     }
+    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(20000) //1 min
+    ssc.awaitTerminationOrTimeout(21000) //1 min
     //            ssc.awaitTerminationOrTimeout(300000) //5 min
   }
 }
@@ -90,3 +91,5 @@ tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStat
   .foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
 
 */
+
+//todo tweet in risposta senza hashtag cengono comunque presi

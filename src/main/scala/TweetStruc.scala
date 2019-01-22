@@ -16,12 +16,16 @@ object TweetStruc {
     * @return
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String):
-  (Long, String, String, Array[String], Array[String], String, String, String) = {
+  (Long, String, String, String, String, String, String, String) = {
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
     (tweet.getId, tweet.getText, tweet.getSentiment, tweet.getHashtags, tweet.getUserMentioned, tweet.getUser, tweet.getCreated_at, tweet.getLanguage)
   }
 
 
+  def tweetStuctString(idT: Long, textT: String, userT: String, createdT: String, langT: String):  String = {
+    tweet = new TweetClass(idT, textT, userT, createdT, langT)
+    tweet.toString("Tweet: ")
+  }
   /**
     *
     * @param heading
@@ -61,9 +65,9 @@ object TweetStruc {
 
     def getSentiment: String = sentimentTweet
 
-    def getHashtags: Array[String] = hashtags
+    def getHashtags: String = hashtags.foldLeft("")((x, y) => x + " " + y)
 
-    def getUserMentioned: Array[String] = listUserMentioned
+    def getUserMentioned: String = listUserMentioned.foldLeft("")((x, y) => x + " " + y)
 
     def getUser: String = user
 

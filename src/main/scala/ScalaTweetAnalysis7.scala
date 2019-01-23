@@ -1,4 +1,5 @@
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import twitter4j.auth.OAuthAuthorization
@@ -43,7 +44,7 @@ object ScalaTweetAnalysis7 {
     //crea lo stream per scaricare i tweet applicando o meno un filtro
     val tweetsDownload = if (filters.length>0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
-/*
+
     val spark = SparkSession
       .builder
       .appName("twitter trying")
@@ -58,12 +59,8 @@ object ScalaTweetAnalysis7 {
       val countTweet= dataFrame.count()
       println("\n\n\n\nNumero Tweet " + countTweet +"\n\n\n")
     }
-    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
-*/
-    tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))//coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
-      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-      .map(t => TweetStruc.tweetStuctString(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-      .foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
+//    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
+
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
@@ -95,4 +92,4 @@ tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStat
 
 */
 
-//todo tweet in risposta senza hashtag cengono comunque presi
+//todo tweet in risposta senza hashtag vengono comunque presi

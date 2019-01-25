@@ -10,6 +10,9 @@ import scala.io.Source
 
 
 object ScalaTweetAnalysis7 {
+
+  val pathAbsolute="gs:\\\\"
+
   /**
     *
     * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
@@ -37,7 +40,7 @@ object ScalaTweetAnalysis7 {
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
 
     //leggo il nome del file ed estrapolo gli hashtag da ricercare
-    var filters = readFile(pathInput)
+    var filters = readFile(pathAbsolute+pathInput)
     //filters.foreach(println)
 
 
@@ -68,7 +71,7 @@ object ScalaTweetAnalysis7 {
       println("\n\n\n\nNumero Tweet " + countTweet + "\n\n\n")
     }
 
-    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet
+    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathAbsolute+pathOutput) } //salva su file i tweet
 
 
     //avvia lo stream e la computazione dei tweet

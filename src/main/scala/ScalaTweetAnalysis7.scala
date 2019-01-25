@@ -5,6 +5,9 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
+import scala.io.Source
+
+
 
 object ScalaTweetAnalysis7 {
   /**
@@ -31,9 +34,13 @@ object ScalaTweetAnalysis7 {
     */
   def downloadTweet(sparkConf: SparkConf, args: Array[String]): Unit = {
     //leggo dai parametri passati dall'utente le 4 chiavi twitter
-    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
-    //leggo dai parametri passati dall'utente i filtri da applicare al downloaddei tweet
-    val filters = args.takeRight(args.length - 4)
+    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
+
+    //leggo il nome del file ed estrapolo gli hashtag da ricercare
+    var filters = readFile(pathInput)
+    //filters.foreach(println)
+
+
     //crea il contesto di streaming con un intervallo di 15 secondi
     val ssc = new StreamingContext(sparkConf, Seconds(10))
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
@@ -50,23 +57,33 @@ object ScalaTweetAnalysis7 {
       .appName("twitter trying")
       .getOrCreate()
 
-    tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+    val tweetEdit=tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-      .foreachRDD { rdd =>
+
+    tweetEdit.foreachRDD { rdd =>
       import spark.implicits._
       val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
       val countTweet = dataFrame.count()
       println("\n\n\n\nNumero Tweet " + countTweet + "\n\n\n")
     }
-    //    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
+
+    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet
 
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
     ssc.awaitTerminationOrTimeout(21000) //1 min
-    //            ssc.awaitTerminationOrTimeout(300000) //5 min
+    //ssc.awaitTerminationOrTimeout(300000) //5 min
+  }
+
+
+  def readFile(filename: String): Array[String] = {
+    val bufferedSource = Source.fromFile(filename)
+    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
+    bufferedSource.close
+    lines
   }
 }
 

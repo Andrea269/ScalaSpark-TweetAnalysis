@@ -35,16 +35,8 @@ object ScalaTweetAnalysis7 {
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
     //crea il contesto di streaming con un intervallo di 15 secondi
     val ssc = new StreamingContext(sparkConf, Seconds(10))
-
-
-
     //leggo il nome del file ed estrapolo gli hashtag da ricercare
     var filters = readFile(pathInput)
-//    val filters = ssc.textFileStream(pathInput).toString.split(" ")
-
-
-
-
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
@@ -53,8 +45,6 @@ object ScalaTweetAnalysis7 {
     //crea lo stream per scaricare i tweet applicando o meno un filtro
     val tweetsDownload = if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
-
-
 
     val tweetEdit=tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
@@ -81,7 +71,6 @@ object ScalaTweetAnalysis7 {
     ssc.awaitTerminationOrTimeout(21000) //1 min
     //ssc.awaitTerminationOrTimeout(300000) //5 min
   }
-
 
   def readFile(filename: String): Array[String] = {
     val hadoopPath = new Path(filename)

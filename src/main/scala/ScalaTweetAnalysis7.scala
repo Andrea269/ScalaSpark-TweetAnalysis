@@ -1,5 +1,5 @@
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FSDataInputStream, Path}
+import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.twitter.TwitterUtils
@@ -22,7 +22,13 @@ object ScalaTweetAnalysis7 {
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
 
     //avvia il download e il salvataggio dei tweet
-    downloadTweet(sparkConf, args)
+//    downloadTweet(sparkConf, args)
+
+
+
+
+    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
+    writeFile(pathOutput)
   }
 
   /**
@@ -62,7 +68,6 @@ object ScalaTweetAnalysis7 {
       println("\n\n\n\nNumero Tweet " + countTweet + "\n\n\n")
     }
 
-    //val outputPath = new Path(pathOutput).getFileSystem(new Configuration()).create(outputPath)
 //    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet todo
 
     //avvia lo stream e la computazione dei tweet
@@ -84,12 +89,26 @@ object ScalaTweetAnalysis7 {
       tempInt= wrappedStream.read()
     }while(!tempInt.equals(-1))
 
+    wrappedStream.close()
+
     textFile.split("\n")
 
-//    val bufferedSource = Source.fromFile(filename)
-//    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
-//    bufferedSource.close
-//    lines
+    //    val bufferedSource = Source.fromFile(filename)
+    //    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
+    //    bufferedSource.close
+    //    lines
+  }
+
+  def writeFile(filename: String)= {
+    val hadoopPath = new Path(filename)
+    val outputPath: FSDataOutputStream = hadoopPath.getFileSystem(new Configuration()).create(hadoopPath)
+    val wrappedStream= outputPath.getWrappedStream
+
+
+    wrappedStream.write(123)
+
+
+    wrappedStream.close()
   }
 }
 

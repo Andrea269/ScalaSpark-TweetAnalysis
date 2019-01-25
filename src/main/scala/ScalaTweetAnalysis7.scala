@@ -1,3 +1,5 @@
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FSDataInputStream, Path}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.twitter.TwitterUtils
@@ -5,14 +7,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
-import scala.io.Source
-
-
-
 object ScalaTweetAnalysis7 {
-
-  val pathAbsolute="gs:\\\\"
-
   /**
     *
     * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
@@ -38,14 +33,18 @@ object ScalaTweetAnalysis7 {
   def downloadTweet(sparkConf: SparkConf, args: Array[String]): Unit = {
     //leggo dai parametri passati dall'utente le 4 chiavi twitter
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
-
-    //leggo il nome del file ed estrapolo gli hashtag da ricercare
-    var filters = readFile(pathAbsolute+pathInput)
-    //filters.foreach(println)
-
-
     //crea il contesto di streaming con un intervallo di 15 secondi
     val ssc = new StreamingContext(sparkConf, Seconds(10))
+
+
+
+    //leggo il nome del file ed estrapolo gli hashtag da ricercare
+    var filters = readFile(pathInput)
+//    val filters = ssc.textFileStream(pathInput).toString.split(" ")
+
+
+
+
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
@@ -55,14 +54,16 @@ object ScalaTweetAnalysis7 {
     val tweetsDownload = if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
 
-    val spark = SparkSession
-      .builder
-      .appName("twitter trying")
-      .getOrCreate()
+
 
     val tweetEdit=tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
+
+    val spark = SparkSession
+      .builder
+      .appName("twitter trying")
+      .getOrCreate()
 
     tweetEdit.foreachRDD { rdd =>
       import spark.implicits._
@@ -71,8 +72,8 @@ object ScalaTweetAnalysis7 {
       println("\n\n\n\nNumero Tweet " + countTweet + "\n\n\n")
     }
 
-    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathAbsolute+pathOutput) } //salva su file i tweet
-
+    //val outputPath = new Path(pathOutput).getFileSystem(new Configuration()).create(outputPath)
+//    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet todo
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
@@ -83,10 +84,23 @@ object ScalaTweetAnalysis7 {
 
 
   def readFile(filename: String): Array[String] = {
-    val bufferedSource = Source.fromFile(filename)
-    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
-    bufferedSource.close
-    lines
+    val hadoopPath = new Path(filename)
+    val inputStream: FSDataInputStream = hadoopPath.getFileSystem(new Configuration()).open(hadoopPath)
+    val wrappedStream= inputStream.getWrappedStream
+
+    var textFile: String =""
+    var tempInt= wrappedStream.read()
+    do{
+      textFile+=tempInt.toChar
+      tempInt= wrappedStream.read()
+    }while(!tempInt.equals(-1))
+
+    textFile.split("\n")
+
+//    val bufferedSource = Source.fromFile(filename)
+//    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
+//    bufferedSource.close
+//    lines
   }
 }
 

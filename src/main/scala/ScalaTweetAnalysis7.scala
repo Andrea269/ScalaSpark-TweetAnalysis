@@ -42,7 +42,7 @@ object ScalaTweetAnalysis7 {
     //crea struttura di autenticazione
     val authorization = new OAuthAuthorization(confBuild.build)
     //crea lo stream per scaricare i tweet applicando o meno un filtro
-    val tweetsDownload = if (filters.length>0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
+    val tweetsDownload = if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
 
     val spark = SparkSession
@@ -50,16 +50,16 @@ object ScalaTweetAnalysis7 {
       .appName("twitter trying")
       .getOrCreate()
 
-    tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))//coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+    tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
       .foreachRDD { rdd =>
       import spark.implicits._
       val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
-      val countTweet= dataFrame.count()
-      println("\n\n\n\nNumero Tweet " + countTweet +"\n\n\n")
+      val countTweet = dataFrame.count()
+      println("\n\n\n\nNumero Tweet " + countTweet + "\n\n\n")
     }
-//    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
+    //    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
 
 
     //avvia lo stream e la computazione dei tweet

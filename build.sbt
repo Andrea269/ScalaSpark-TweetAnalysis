@@ -10,7 +10,7 @@ libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.9.2" artifac
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 
 
-val sparkVersion = "2.0.1"
+val sparkVersion = "2.0.2"
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,

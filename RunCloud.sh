@@ -43,7 +43,7 @@ echo "==========================================================================
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- BrHei0bsgOt1V8E6c8tEslIBq YpYpNZA2MaCYgTS72zQ0Mc2ZVS8frfsne1SBw0ClKRmNZObPaO 2294572717-SAEEdj4TFfMqyF3fQP0LXOHvyqV9Ta7seN5dbSw ucBwPupYUhlZB5dkr0yKk4kvb1ukczjvlOvWnZxFBXUsN gs://bucket-twitter/input/HashtagRun1 gs://bucket-twitter/output/tweets1
+      -- BrHei0bsgOt1V8E6c8tEslIBq YpYpNZA2MaCYgTS72zQ0Mc2ZVS8frfsne1SBw0ClKRmNZObPaO 2294572717-SAEEdj4TFfMqyF3fQP0LXOHvyqV9Ta7seN5dbSw ucBwPupYUhlZB5dkr0yKk4kvb1ukczjvlOvWnZxFBXUsN gs://bucket-twitter/input/HashtagRun1 gs://bucket-twitter/input/HashtagRun2 Run1
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
@@ -55,7 +55,7 @@ echo "==========================================================================
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- BrHei0bsgOt1V8E6c8tEslIBq YpYpNZA2MaCYgTS72zQ0Mc2ZVS8frfsne1SBw0ClKRmNZObPaO 2294572717-SAEEdj4TFfMqyF3fQP0LXOHvyqV9Ta7seN5dbSw ucBwPupYUhlZB5dkr0yKk4kvb1ukczjvlOvWnZxFBXUsN gs://bucket-twitter/input/HashtagRun2 gs://bucket-twitter/output/tweets2
+      -- BrHei0bsgOt1V8E6c8tEslIBq YpYpNZA2MaCYgTS72zQ0Mc2ZVS8frfsne1SBw0ClKRmNZObPaO 2294572717-SAEEdj4TFfMqyF3fQP0LXOHvyqV9Ta7seN5dbSw ucBwPupYUhlZB5dkr0yKk4kvb1ukczjvlOvWnZxFBXUsN gs://bucket-twitter/input/HashtagRun2 gs://bucket-twitter/output/tweets2 Run2
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="

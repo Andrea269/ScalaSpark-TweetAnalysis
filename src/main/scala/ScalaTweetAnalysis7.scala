@@ -1,48 +1,45 @@
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
 object ScalaTweetAnalysis7 {
+  var hashtagCounterMap = scala.collection.immutable.Map[String, Int]()
   /**
     *
     * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
     */
   def main(args: Array[String]) {
-    if (args.length < 4) {
+    if (args.length < 7) {
       //controlla che almeno le 4 chiavi di accesso siano state passate come parametro al programma
       System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
       System.exit(1)
     }
     val sparkConf = new SparkConf() //configura spark
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
+    val sc = new SparkContext(sparkConf)
 
-    //avvia il download e il salvataggio dei tweet
-//    downloadTweet(sparkConf, args)
-
-
-
-
-    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
-    writeFile(pathOutput)
+    //avvia il download
+    downloadTweet(sc, args)
   }
 
   /**
     *
-    * @param sparkConf variabile di configurazione di spark
-    * @param args      consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
+    * @param sc SparkContext
+    * @param args consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput, numRun
     */
-  def downloadTweet(sparkConf: SparkConf, args: Array[String]): Unit = {
+  def downloadTweet(sc: SparkContext, args: Array[String]) = {
     //leggo dai parametri passati dall'utente le 4 chiavi twitter
-    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput) = args.take(6)
+    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput, numRun) = args.take(7)
     //crea il contesto di streaming con un intervallo di 15 secondi
-    val ssc = new StreamingContext(sparkConf, Seconds(10))
+    val ssc = new StreamingContext(sc, Seconds(10))
     //leggo il nome del file ed estrapolo gli hashtag da ricercare
-    var filters = readFile(pathInput)
+    var filters = readFile(pathInput).map(t => " "+t+" ")
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
@@ -64,19 +61,32 @@ object ScalaTweetAnalysis7 {
     tweetEdit.foreachRDD { rdd =>
       import spark.implicits._
       val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
+//      dataFrame.select("hashtags").show()
       val countTweet = dataFrame.count()
-      println("\n\n\n\nNumero Tweet " + countTweet + "\n\n\n")
+      println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
     }
 
-//    tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet todo
+    val data= tweetEdit.map(t => for (a <- t._4.split(" ")) if(!a.equals("")) hashtagCounterMap+= a -> (hashtagCounterMap.getOrElse(a, 0) + 1) )
+    data.foreachRDD{rdd => rdd.collect()}
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
     ssc.awaitTerminationOrTimeout(21000) //1 min
     //ssc.awaitTerminationOrTimeout(300000) //5 min
+
+//    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")
+    if(numRun.equals("Run1"))
+      writeFile(pathOutput, getTopHashtag(30))//pathOutput "input/HashtagRun2"
+    else
+      graphComputation(tweetEdit, pathOutput)
   }
 
+  /**
+    *
+    * @param filename
+    * @return
+    */
   def readFile(filename: String): Array[String] = {
     val hadoopPath = new Path(filename)
     val inputStream: FSDataInputStream = hadoopPath.getFileSystem(new Configuration()).open(hadoopPath)
@@ -92,23 +102,44 @@ object ScalaTweetAnalysis7 {
     wrappedStream.close()
 
     textFile.split("\n")
-
-    //    val bufferedSource = Source.fromFile(filename)
-    //    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
-    //    bufferedSource.close
-    //    lines
   }
 
-  def writeFile(filename: String)= {
+  /**
+    *
+    * @param filename
+    * @param text
+    */
+  def writeFile(filename: String, text: String)= {
     val hadoopPath = new Path(filename)
     val outputPath: FSDataOutputStream = hadoopPath.getFileSystem(new Configuration()).create(hadoopPath)
     val wrappedStream= outputPath.getWrappedStream
 
-
-    wrappedStream.write(123)
-
-
+    for(i<- text){
+      wrappedStream.write(i.toInt)
+    }
     wrappedStream.close()
+  }
+
+  /**
+    *
+    * @param percent
+    * @return
+    */
+  def getTopHashtag(percent: Int):String= {
+    val orderHashtag=hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
+    var topHashtag=""
+    for(i<- 0 until orderHashtag.length * percent / 100) topHashtag+= orderHashtag(i) + "\n"
+
+    topHashtag
+  }
+
+  /**
+    *
+    * @param tweet DStream[(Long, String, String, String, String, String, String, String)])
+    */
+  def graphComputation(tweet: DStream[(Long, String, String, String, String, String, String, String)], pathOutput: String): Unit = {
+    writeFile(pathOutput, getTopHashtag(30))
+    //todo DOMENICO
   }
 }
 
@@ -124,9 +155,9 @@ tweetsDownload.foreachRDD { rdd =>
     .saveAsTextFile("OUT/tweets") //salva su file i tweet "OUT/tweets"
   //        .persist()
 }
-*/
 
-/*
+tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet
+
 tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))//coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
   .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
   .map(t => TweetStruc.tweetStuctString(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet

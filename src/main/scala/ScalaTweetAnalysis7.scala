@@ -41,6 +41,7 @@ object ScalaTweetAnalysis7 {
     //leggo il nome del file ed estrapolo gli hashtag da ricercare
     val pathFilter= if(numRun.equals("Run1")) pathInput+"HashtagRun1" else pathInput+"HashtagRun2"
     var filters = readFile(pathFilter).map(t => " "+t+" ")
+    var timeRun = readFile(pathInput+"Time").map(t => t.split("=")(1))
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
@@ -73,7 +74,7 @@ object ScalaTweetAnalysis7 {
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(21000) //1 min
+    ssc.awaitTerminationOrTimeout(if(numRun.equals("Run1")) timeRun(0).toLong else  timeRun(1).toLong ) //1 min
     //ssc.awaitTerminationOrTimeout(300000) //5 min
 
 //    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")

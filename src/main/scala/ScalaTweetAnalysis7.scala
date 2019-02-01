@@ -74,7 +74,7 @@ object ScalaTweetAnalysis7 {
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(if(numRun.equals("Run1")) timeRun(0).toLong else  timeRun(1).toLong ) //1 min
+    ssc.awaitTerminationOrTimeout(if(numRun.equals("Run1")) timeRun(0).toLong else  timeRun(1).toLong)
     //ssc.awaitTerminationOrTimeout(300000) //5 min
 
 //    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")

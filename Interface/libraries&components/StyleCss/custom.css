@@ -1,0 +1,139 @@
+body {
+    margin: 0;
+}
+/* Set black background color, white text and some padding */
+footer {
+    background-color: #555;
+    color: white;
+    position:absolute;
+    bottom:0;
+    width:100%;
+    padding: 10px;
+}
+
+
+li.menuUp a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+li.menuUp a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+}
+
+p{
+    font-family: arial, sans-serif;
+}
+
+ul.text{
+    font-family: arial, sans-serif;
+}
+
+/*Menu laterale*/
+h2.titleMenu{
+    padding: 8px 16px;
+}
+
+ul.leftMenu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 17%;
+    background-color: #f1f1f1;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+li.leftMenu a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+li.leftMenu a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+li.leftMenu a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+}
+
+/*Stile tabella*/
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+    background-color: #fff;
+}
+
+td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(odd) {
+    background-color: #eee;
+}
+
+/*Custom styles*/
+
+.row{
+    padding-top: 70px;
+    padding-bottom: 30px;
+}
+
+.jumbotron{
+    margin-top: 50px;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    color: #fff;
+}
+/*Modifica glyphicon*/
+span.glyphicon-icon-github{
+    font-size: 1.3em;
+    color:red;
+}
+span.glyphicon-star-empty{
+    font-size: 1.6em;
+    color:yellow;
+}
+
+div.demo{
+    margin-left:17%;
+    padding:5px 16px;
+    margin-right:5%;
+}
+
+p.error{
+    color: red;
+}
+
+/*D3 Style*/
+
+.link {
+    stroke: #aaa;
+}
+
+.node text {
+    stroke:#333;
+    cursos:pointer;
+}
+
+.node circle{
+    stroke:#fff;
+    stroke-width:3px;
+    fill:#555;
+}

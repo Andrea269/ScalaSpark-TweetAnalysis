@@ -1,15 +1,15 @@
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap = scala.collection.immutable.Map[String, Int]()
+  val percent: Int= 30
   /**
     *
     * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
@@ -39,7 +39,9 @@ object ScalaTweetAnalysis7 {
     //crea il contesto di streaming con un intervallo di 15 secondi
     val ssc = new StreamingContext(sc, Seconds(10))
     //leggo il nome del file ed estrapolo gli hashtag da ricercare
-    var filters = readFile(pathInput).map(t => " "+t+" ")
+    val pathFilter= if(numRun.equals("Run1")) pathInput+"HashtagRun1" else pathInput+"HashtagRun2"
+    var filters = readFile(pathFilter).map(t => " "+t+" ")
+    var timeRun = readFile(pathInput+"Time").map(t => t.split("=")(1))
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
@@ -72,14 +74,15 @@ object ScalaTweetAnalysis7 {
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    ssc.awaitTerminationOrTimeout(21000) //1 min
+    ssc.awaitTerminationOrTimeout(if(numRun.equals("Run1")) timeRun(0).toLong else  timeRun(1).toLong ) //1 min
     //ssc.awaitTerminationOrTimeout(300000) //5 min
 
 //    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")
     if(numRun.equals("Run1"))
-      writeFile(pathOutput, getTopHashtag(30))//pathOutput "input/HashtagRun2"
+      writeFile(pathOutput+"HashtagRun2", getTopHashtag())
     else
-      graphComputation(tweetEdit, pathOutput)
+      graphComputation(pathInput, pathOutput)
+
   }
 
   /**
@@ -122,10 +125,9 @@ object ScalaTweetAnalysis7 {
 
   /**
     *
-    * @param percent
     * @return
     */
-  def getTopHashtag(percent: Int):String= {
+  def getTopHashtag():String= {
     val orderHashtag=hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
     var topHashtag=""
     for(i<- 0 until orderHashtag.length * percent / 100) topHashtag+= orderHashtag(i) + "\n"
@@ -135,10 +137,11 @@ object ScalaTweetAnalysis7 {
 
   /**
     *
-    * @param tweet DStream[(Long, String, String, String, String, String, String, String)])
+    * @param pathInput
+    * @param pathOutput
     */
-  def graphComputation(tweet: DStream[(Long, String, String, String, String, String, String, String)], pathOutput: String): Unit = {
-    writeFile(pathOutput, getTopHashtag(30))
+  def graphComputation(pathInput: String, pathOutput: String): Unit = {
+    writeFile(pathOutput, getTopHashtag())
     //todo DOMENICO
   }
 }

@@ -65,7 +65,7 @@ object TweetStruc {
 
     def getSentiment: String = sentimentTweet
 
-    def getHashtags: String = hashtags.foldLeft("")((x, y) => x + " " + y)
+    def getHashtags: String = " " + hashtags.foldLeft("")((x, y) => x + " " + y) + " " //mettiamo gli spazi alla fine e all'inizio per fare la query SQL like
 
     def getUserMentioned: String = listUserMentioned.foldLeft("")((x, y) => x + " " + y)
 

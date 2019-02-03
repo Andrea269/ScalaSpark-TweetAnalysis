@@ -1,6 +1,6 @@
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -9,6 +9,7 @@ import twitter4j.conf.ConfigurationBuilder
 
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap = scala.collection.immutable.Map[String, Int]()
+  var edgeMap = scala.collection.immutable.Map[(String, String), Long]()
   val percent: Int= 30
   /**
     *
@@ -60,21 +61,51 @@ object ScalaTweetAnalysis7 {
       .appName("twitter trying")
       .getOrCreate()
 
+
+    val data= tweetEdit.map(t => for (a <- t._4.split(" ")) if(!a.equals("")) hashtagCounterMap+= a -> (hashtagCounterMap.getOrElse(a, 0) + 1) )
+    data.foreachRDD{rdd => rdd.collect()
+    }
+
+    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+
     tweetEdit.foreachRDD { rdd =>
       import spark.implicits._
       val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
-//      dataFrame.select("hashtags").show()
+      //      dataFrame.select("hashtags").show()
+
+      dataFrame.createOrReplaceTempView("dataFrame")
+      val text2 = sqlContext.sql("SELECT hashtags FROM dataFrame")
+      text2.show()
+     for (a <- hashtagCounterMap) {
+       for(b <-hashtagCounterMap) {
+         if (!a._1.equals(b._1)) {
+           val links = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %' AND hashtags LIKE '% " + b._1 + " %'")
+           val tipo2: Long = links.head().getLong(0)
+           //println("test: " + a._1 + " " + b._1 + " " + tipo)
+           if(tipo2 != 0) edgeMap += (a._1, b._1) -> tipo2
+         }
+       }
+       println(a._1)
+       import spark.implicits._
+       val teenagers = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %'")
+       teenagers.show()
+       println("be oh")
+       val tipo: Long = teenagers.head().getLong(0)
+       println("count: " + tipo)
+     }
+
       val countTweet = dataFrame.count()
       println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
     }
-
-    val data= tweetEdit.map(t => for (a <- t._4.split(" ")) if(!a.equals("")) hashtagCounterMap+= a -> (hashtagCounterMap.getOrElse(a, 0) + 1) )
-    data.foreachRDD{rdd => rdd.collect()}
 
     //avvia lo stream e la computazione dei tweet
     ssc.start()
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
     ssc.awaitTerminationOrTimeout(if(numRun.equals("Run1")) timeRun(0).toLong else  timeRun(1).toLong)
+
+    println("eee")
+    println(hashtagCounterMap)
+    println(edgeMap)
     //ssc.awaitTerminationOrTimeout(300000) //5 min
 
 //    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")

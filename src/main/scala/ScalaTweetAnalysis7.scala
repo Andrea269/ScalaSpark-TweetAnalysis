@@ -7,8 +7,11 @@ import org.apache.spark.{SparkConf, SparkContext}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
+import scala.annotation.tailrec
+
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
+  var hashtagSentimentMap = scala.collection.immutable.Map[String, Long]()
   var edgeMap: Map[(String, String), Long] = scala.collection.immutable.Map[(String, String), Long]()
   val percent: Int= 30
   /**
@@ -52,7 +55,11 @@ object ScalaTweetAnalysis7 {
     val tweetsDownload = if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
 
-    val tweetEdit=tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+    val tweetFilter=tweetsDownload.filter(t=> if(t.getRetweetedStatus != null) t.getRetweetedStatus.getInReplyToUserId() == -1 else t.getInReplyToUserId() == -1)
+
+    tweetFilter.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput+"tweet") } //salva su file i tweet
+
+    val tweetEdit=tweetFilter.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
 
@@ -65,35 +72,68 @@ object ScalaTweetAnalysis7 {
     val data= tweetEdit.map(t => for (a <- t._4.split(" ")) if(!a.equals("")) hashtagCounterMap+= a -> (hashtagCounterMap.getOrElse(a, 0) + 1) )
     data.foreachRDD{rdd => rdd.collect()}
     if(!numRun.equals("Run1")){
-      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 
       tweetEdit.foreachRDD { rdd =>
         import spark.implicits._
         val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
-        //      dataFrame.select("hashtags").show()
+        dataFrame.select("hashtags").show()
 
         dataFrame.createOrReplaceTempView("dataFrame")
-        val text2 = sqlContext.sql("SELECT hashtags FROM dataFrame")
-        text2.show()
+        val text2 = spark.sql("SELECT hashtags, sentiment FROM dataFrame")
+        text2.show(50, false)
         for (a <- hashtagCounterMap) {
+          println ("ioconto")
+          println(hashtagCounterMap.size)
+          val listPositionsApostrofo = indexesOf(a._1, "'")
+          var keyParsedA = a._1
+          for (c <- listPositionsApostrofo) {
+            keyParsedA = a._1.patch(c, "'", 0)
+          }
+
+          val sentiment = spark.sql("SELECT SUM(sentiment) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %'")
+          var sum2: Long = 0
+          val isNull = sentiment.head().anyNull
+          if (!isNull) {
+            sum2 = sentiment.head.getLong(0)
+          }
+          val sum3: Long = hashtagSentimentMap.getOrElse((a._1), 0)
+          val sum4 = sum3 + sum2
+
+          hashtagSentimentMap += (a._1) -> sum4
+          println("chiave " + keyParsedA)
+          sentiment.show(50, false)
+          var bool = false
           for(b <-hashtagCounterMap) {
-            if (!a._1.equals(b._1)) {
-              val links = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %' AND hashtags LIKE '% " + b._1 + " %'")
-              val tipo2: Long = links.head().getLong(0)
-              //println("test: " + a._1 + " " + b._1 + " " + tipo)
-              if(tipo2 != 0) edgeMap += (a._1, b._1) -> tipo2
+            if (bool) {
+              val listPositionsApostrofo = indexesOf(b._1, "'")
+              var keyParsedB = b._1
+              for (c <- listPositionsApostrofo) {
+                keyParsedB = b._1.patch(c, "'", 0)
+              }
+              val links = spark.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %' AND hashtags LIKE '% " + keyParsedB + " %'")
+
+              links.show(50, false)
+             val tipo2: Long = links.head().getLong(0)
+
+              if(tipo2 != 0) {
+                val tipo3: Long = edgeMap.getOrElse((a._1, b._1), 0)
+                val tipo4 = tipo3 + tipo2
+                edgeMap += (a._1, b._1) -> tipo4
+              }
+            }
+            if (a._1.equals(b._1) ) { //per evitare ripetizioni tuple con gli elementi invertiti
+              bool = true
             }
           }
-          println(a._1)
-          val teenagers = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %'")
-          teenagers.show()
-          println("be oh")
-          val tipo: Long = teenagers.head().getLong(0)
-          println("count: " + tipo)
+        //  println(a._1)
+        //  val teenagers = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %'")
+       //   teenagers.show(50, false)
+        //  val tipo: Long = teenagers.head().getLong(0)
         }
 
-        val countTweet = dataFrame.count()
-        println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
+      //  val countTweet = dataFrame.count()
+      // println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
+        rdd.collect()
       }
     }
 
@@ -102,9 +142,13 @@ object ScalaTweetAnalysis7 {
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
     ssc.awaitTerminationOrTimeout(if(numRun.equals("Run1")) timeRun(0).toLong else  timeRun(1).toLong)
 
+    ssc.stop()
+
     println("eee")
     println(hashtagCounterMap)
     println(edgeMap)
+    val avrSentiment = hashtagSentimentMap map {case (a, b) => (a, b / hashtagCounterMap.getOrElse(a, 0).toFloat)}
+    println(avrSentiment)
     //ssc.awaitTerminationOrTimeout(300000) //5 min
 
 //    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")
@@ -113,6 +157,16 @@ object ScalaTweetAnalysis7 {
     else
       graphComputation(pathOutput)
 
+  }
+
+  def indexesOf(source: String, target: String, index: Int = 0, withinOverlaps: Boolean = false): List[Int] = {
+    @tailrec def recursive(indexTarget: Int, accumulator: List[Int]): List[Int] = {
+      val position = source.indexOf(target, indexTarget)
+      if (position == -1) accumulator
+      else
+        recursive(position + (if (withinOverlaps) 1 else target.size), position :: accumulator)
+    }
+    recursive(index, Nil).reverse
   }
 
   /**

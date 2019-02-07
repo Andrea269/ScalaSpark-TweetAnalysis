@@ -43,7 +43,7 @@ app.controller('graphController', function ($scope, graphService) {
                 .call(force.drag);
 
             node.append("circle")
-                .attr("r", "5");
+                .attr("r", "10");
 
             node.append("text")
                 .attr("dx", 12)

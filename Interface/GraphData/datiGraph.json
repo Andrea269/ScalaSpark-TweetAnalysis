@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "name": "#Guaido,",
+      "group": 1
+    },
+    {
+      "name": "#Resist&",
+      "group": 2
+    },
+    {
+      "name": "#BatmanTrump",
+      "group": 3
+    },
+    {
+      "name": "#2",
+      "group": 4
+    },
+    {
+      "name": "#Trump...",
+      "group": 5
+    },
+    {
+      "name": "#islamistes,",
+      "group": 6
+    },
+    {
+      "name": "#Trump",
+      "group": 7
+    },
+    {
+      "name": "#sida",
+      "group": 8
+    },
+    {
+      "name": "#ImpeachTrump",
+      "group": 9
+    },
+    {
+      "name": "#Trump,",
+      "group": 10
+    }
+  ],
+  "links": [
+    {
+      "source": 1,
+      "target": 5,
+      "weight": 1
+    },
+    {
+      "source": 2,
+      "target": 7,
+      "weight": 1
+    },
+    {
+      "source": 2,
+      "target": 9,
+      "weight": 1
+    }
+  ]
+}

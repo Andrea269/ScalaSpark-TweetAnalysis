@@ -58,7 +58,7 @@ object TweetStruc {
     private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
-    val sentimentTweet: String =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)).toString else "NEUTRAL" //calcola il sentimento del testo del tweet
+    val sentimentTweet: String =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)).toString else "0" //calcola il sentimento del testo del tweet
     def getId: Long = id
 
     def getText: String = textTweet

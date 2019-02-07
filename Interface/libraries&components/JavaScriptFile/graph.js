@@ -22,7 +22,7 @@ app.controller('graphController', function ($scope, graphService) {
             .charge(-100)
             .size([width, height]);
 
-        d3.json("libraries&components/datiGraph.json", function (json) {
+        d3.json("GraphData/datiGraph.json", function (json) {
             force
                 .nodes(json.nodes)
                 .links(json.links)

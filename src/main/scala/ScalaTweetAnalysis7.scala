@@ -1,6 +1,6 @@
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -8,8 +8,8 @@ import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
 object ScalaTweetAnalysis7 {
-  var hashtagCounterMap = scala.collection.immutable.Map[String, Int]()
-  var edgeMap = scala.collection.immutable.Map[(String, String), Long]()
+  var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
+  var edgeMap: Map[(String, String), Long] = scala.collection.immutable.Map[(String, String), Long]()
   val percent: Int= 30
   /**
     *
@@ -63,39 +63,38 @@ object ScalaTweetAnalysis7 {
 
 
     val data= tweetEdit.map(t => for (a <- t._4.split(" ")) if(!a.equals("")) hashtagCounterMap+= a -> (hashtagCounterMap.getOrElse(a, 0) + 1) )
-    data.foreachRDD{rdd => rdd.collect()
-    }
+    data.foreachRDD{rdd => rdd.collect()}
+    if(!numRun.equals("Run1")){
+      val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 
-    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+      tweetEdit.foreachRDD { rdd =>
+        import spark.implicits._
+        val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
+        //      dataFrame.select("hashtags").show()
 
-    tweetEdit.foreachRDD { rdd =>
-      import spark.implicits._
-      val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
-      //      dataFrame.select("hashtags").show()
+        dataFrame.createOrReplaceTempView("dataFrame")
+        val text2 = sqlContext.sql("SELECT hashtags FROM dataFrame")
+        text2.show()
+        for (a <- hashtagCounterMap) {
+          for(b <-hashtagCounterMap) {
+            if (!a._1.equals(b._1)) {
+              val links = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %' AND hashtags LIKE '% " + b._1 + " %'")
+              val tipo2: Long = links.head().getLong(0)
+              //println("test: " + a._1 + " " + b._1 + " " + tipo)
+              if(tipo2 != 0) edgeMap += (a._1, b._1) -> tipo2
+            }
+          }
+          println(a._1)
+          val teenagers = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %'")
+          teenagers.show()
+          println("be oh")
+          val tipo: Long = teenagers.head().getLong(0)
+          println("count: " + tipo)
+        }
 
-      dataFrame.createOrReplaceTempView("dataFrame")
-      val text2 = sqlContext.sql("SELECT hashtags FROM dataFrame")
-      text2.show()
-     for (a <- hashtagCounterMap) {
-       for(b <-hashtagCounterMap) {
-         if (!a._1.equals(b._1)) {
-           val links = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %' AND hashtags LIKE '% " + b._1 + " %'")
-           val tipo2: Long = links.head().getLong(0)
-           //println("test: " + a._1 + " " + b._1 + " " + tipo)
-           if(tipo2 != 0) edgeMap += (a._1, b._1) -> tipo2
-         }
-       }
-       println(a._1)
-       import spark.implicits._
-       val teenagers = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + a._1 + " %'")
-       teenagers.show()
-       println("be oh")
-       val tipo: Long = teenagers.head().getLong(0)
-       println("count: " + tipo)
-     }
-
-      val countTweet = dataFrame.count()
-      println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
+        val countTweet = dataFrame.count()
+        println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
+      }
     }
 
     //avvia lo stream e la computazione dei tweet
@@ -112,7 +111,7 @@ object ScalaTweetAnalysis7 {
     if(numRun.equals("Run1"))
       writeFile(pathOutput+"HashtagRun2", getTopHashtag())
     else
-      graphComputation(pathInput, pathOutput)
+      graphComputation(pathOutput)
 
   }
 
@@ -168,12 +167,51 @@ object ScalaTweetAnalysis7 {
 
   /**
     *
-    * @param pathInput
     * @param pathOutput
     */
-  def graphComputation(pathInput: String, pathOutput: String): Unit = {
-    writeFile(pathOutput, getTopHashtag())
-    //todo DOMENICO
+  def graphComputation(pathOutput: String): Unit = {
+    var orderKnots: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
+
+    val numberHashtag=hashtagCounterMap.size
+    var count= 0
+    var textBubbleChart="var dataset = {\n    \"children\": ["
+    var textGraph="{\n  \"nodes\": ["
+    for (i <- hashtagCounterMap) {
+      count+=1
+      orderKnots+= i._1-> count
+      textBubbleChart+="\n        {\n            \"name\": \""+i._1
+      textBubbleChart+="\",\n            \"count\": "+i._2.toString
+      textBubbleChart+="\n        }"
+
+      textGraph+="\n    {\n      \"name\": \""+i._1
+      textGraph+="\",\n      \"group\": "+count//i._2._2.toString
+      textGraph+="\n    }"
+
+      if(count!=numberHashtag) {
+        textBubbleChart+=","
+        textGraph+=","
+      }
+    }
+    textBubbleChart+="\n    ]\n};"
+    writeFile(pathOutput+"datiBubbleChart.js", textBubbleChart)
+
+    textGraph+="\n  ],\n  \"links\": ["
+
+
+    val numberEdge=edgeMap.size
+    count= 0
+    for (i <- edgeMap) {
+      val x1=orderKnots.getOrElse(i._1._1, 0)
+      val x2=orderKnots.getOrElse(i._1._2, 0)
+      count+=1
+      textGraph+="\n    {\n      \"source\": "+x1
+      textGraph+=",\n      \"target\": "+x2
+      textGraph+=",\n      \"weight\": "+i._2
+      textGraph+="\n    }"
+      if(count!=numberEdge) textGraph+=","
+    }
+    textGraph+="\n  ]\n}"
+    writeFile(pathOutput+"datiGraph.json", textGraph)
   }
 }
 

@@ -13,10 +13,13 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 val sparkVersion = "2.0.2"
 
 libraryDependencies ++= Seq(
+  "org.twitter4j" % "twitter4j-core" % "4.0.6",
+  "org.twitter4j" % "twitter4j-stream" % "4.0.6",
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-streaming" % sparkVersion,
   "org.apache.bahir" %% "spark-streaming-twitter" % sparkVersion,
-  "org.apache.spark" %% "spark-sql" % sparkVersion
+  "org.apache.spark" %% "spark-sql" % sparkVersion,
+  "org.apache.spark" %% "spark-graphx" % sparkVersion
 )
 
 

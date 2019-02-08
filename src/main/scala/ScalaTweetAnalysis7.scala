@@ -54,7 +54,7 @@ object ScalaTweetAnalysis7 {
     var timeRun = readFile(pathInput + "Time").map(t => t.split("=")(1))
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
     val confBuild = new ConfigurationBuilder
-    confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret)
+    confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret).setTweetModeExtended(true)
     //crea struttura di autenticazione
     val authorization = new OAuthAuthorization(confBuild.build)
     //crea lo stream per scaricare i tweet applicando o meno un filtro

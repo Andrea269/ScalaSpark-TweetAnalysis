@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scalaspark-tweetanalysis.iml" filepath="$PROJECT_DIR$/.idea/modules/scalaspark-tweetanalysis.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scalaspark-tweetanalysis-build.iml" filepath="$PROJECT_DIR$/.idea/modules/scalaspark-tweetanalysis-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ScalaSpark-TweetAnalysis.iml" filepath="$PROJECT_DIR$/.idea/modules/ScalaSpark-TweetAnalysis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ScalaSpark-TweetAnalysis-build.iml" filepath="$PROJECT_DIR$/.idea/modules/ScalaSpark-TweetAnalysis-build.iml" />
     </modules>
   </component>
 </project>

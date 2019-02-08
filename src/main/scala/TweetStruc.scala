@@ -16,7 +16,7 @@ object TweetStruc {
     * @return
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String):
-  (Long, String, String, String, String, String, String, String) = {
+  (Long, String, Int, String, String, String, String, String) = {
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
     (tweet.getId, tweet.getText, tweet.getSentiment, tweet.getHashtags, tweet.getUserMentioned, tweet.getUser, tweet.getCreated_at, tweet.getLanguage)
   }
@@ -58,12 +58,12 @@ object TweetStruc {
     private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
-    val sentimentTweet: String =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)).toString else "0" //calcola il sentimento del testo del tweet
+    val sentimentTweet: Int =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
     def getId: Long = id
 
     def getText: String = textTweet
 
-    def getSentiment: String = sentimentTweet
+    def getSentiment: Int = sentimentTweet
 
     def getHashtags: String = " " + hashtags.foldLeft("")((x, y) => x + " " + y) + " " //mettiamo gli spazi alla fine e all'inizio per fare la query SQL like
 
@@ -99,7 +99,7 @@ object TweetStruc {
       returnDate
     }
 
-    def computesSentiment(input: String): Sentiment = {
+    def computesSentiment(input: String): Int = {
       val props = new Properties()
       props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
       val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
@@ -109,7 +109,7 @@ object TweetStruc {
         * @param input
         * @return
         */
-      def ExecutionComputesSentiment(input: String): Sentiment = Option(input) match {
+      def ExecutionComputesSentiment(input: String): Int = Option(input) match {
         case Some(text) if !text.isEmpty => extractSentiment(text)
         case _ => throw new IllegalArgumentException("input can't be null or empty")
       }
@@ -119,7 +119,7 @@ object TweetStruc {
         * @param text
         * @return
         */
-      def extractSentiment(text: String): Sentiment = {
+      def extractSentiment(text: String): Int = {
         val (_, sentiment) = extractSentiments(text)
           .maxBy { case (sentence, _) => sentence.length }
         sentiment
@@ -130,12 +130,12 @@ object TweetStruc {
         * @param text
         * @return
         */
-      def extractSentiments(text: String): List[(String, Sentiment)] = {
+      def extractSentiments(text: String): List[(String, Int)] = {
         val annotation: Annotation = pipeline.process(text)
         val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
         sentences
           .map(sentence => (sentence, sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
-          .map { case (sentence, tree) => (sentence.toString, Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
+          .map { case (sentence, tree) => (sentence.toString, RNNCoreAnnotations.getPredictedClass(tree)) }
           .toList
       }
 
@@ -182,8 +182,8 @@ object TweetStruc {
       if (input == null) " " else
         input.split("\\s+") //(' ')|('\n')|('\t')|('\r')
           .filterNot(p => p.length>4 && p.take(4).toString.equals("http"))
-//          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
-//          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
+          //          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
+          //          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
           .foldLeft("")((x,y)=>x + " " + y)
     }
 

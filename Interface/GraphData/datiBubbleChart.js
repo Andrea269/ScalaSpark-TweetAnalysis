@@ -5,19 +5,35 @@ var dataset = {
             "count": 1
         },
         {
+            "name": "#FoxAndFriends",
+            "count": 1
+        },
+        {
+            "name": "#Maga",
+            "count": 1
+        },
+        {
+            "name": "#TrumpTV's",
+            "count": 1
+        },
+        {
+            "name": "#Qanon",
+            "count": 1
+        },
+        {
             "name": "#KAG",
             "count": 1
         },
         {
-            "name": "#FanDuel",
+            "name": "#DraftKings",
             "count": 1
         },
         {
-            "name": "#ProLife",
+            "name": "#FridayFeeling",
             "count": 1
         },
         {
-            "name": "#Thefive",
+            "name": "#MorningJoe",
             "count": 1
         },
         {
@@ -29,16 +45,12 @@ var dataset = {
             "count": 1
         },
         {
-            "name": "#MAGA",
-            "count": 1
-        },
-        {
             "name": "#ccot",
             "count": 1
         },
         {
             "name": "#Trump",
-            "count": 1
+            "count": 2
         },
         {
             "name": "#NBA",

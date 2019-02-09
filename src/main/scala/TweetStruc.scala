@@ -43,11 +43,12 @@ object TweetStruc {
   class TweetClass(idT: Long, textT: String, userT: String, createdT: String, langT: String) {
 
     import java.util.Properties
+
     import edu.stanford.nlp.ling.CoreAnnotations
     import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
     import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
     import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
-    import Sentiment.Sentiment
+
     import scala.collection.convert.wrapAll._
 
     private val id: Long = idT
@@ -58,7 +59,8 @@ object TweetStruc {
     private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
-    val sentimentTweet: Int =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
+//    val sentimentTweet: Int =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
+    val sentimentTweet: Int =if(textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
     def getId: Long = id
 
     def getText: String = textTweet

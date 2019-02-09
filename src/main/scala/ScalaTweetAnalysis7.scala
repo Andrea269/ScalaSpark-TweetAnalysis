@@ -20,22 +20,21 @@ object ScalaTweetAnalysis7 {
 
   /**
     *
-    * @param args consumerKey consumerKeySecret accessToken accessTokenSecret filter [Optional]
+    * @param args consumerKey consumerKeySecret accessToken accessTokenSecret pathInput pathOutput numberRun
     */
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
     if (args.length < 7) {
-      //controlla che almeno le 4 chiavi di accesso siano state passate come parametro al programma
-      System.err.println("Usage: TwitterData <ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret> [<filters>]")
+      //controlla che tutti i parametri necessari siano stati forniti in input
+      System.err.println("Provide input:<ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret><pathInput><pathOutput><numberRun>")
       System.exit(1)
     }
     val sparkConf = new SparkConf() //configura spark
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
     val sc = new SparkContext(sparkConf)
 
-    //avvia il download
-    downloadTweet(sc, args)
+    downloadTweet(sc, args) //avvia il download
   }
 
   /**
@@ -52,23 +51,24 @@ object ScalaTweetAnalysis7 {
     val pathFilter = if (numRun.equals("Run1")) pathInput + "HashtagRun1" else pathInput + "HashtagRun2"
     var filters = readFile(pathFilter).map(t => " " + t + " ")
     var timeRun = readFile(pathInput + "Time").map(t => t.split("=")(1))
-    //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso
+    //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso e le Info dell'Api
     val confBuild = new ConfigurationBuilder
-    confBuild.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerKeySecret).setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret).setTweetModeExtended(true)
-    //crea struttura di autenticazione
-    val authorization = new OAuthAuthorization(confBuild.build)
+    confBuild.setDebugEnabled(true)
+      .setTweetModeExtended(true)
+      .setOAuthConsumerKey(consumerKey)
+      .setOAuthConsumerSecret(consumerKeySecret)
+      .setOAuthAccessToken(accessToken)
+      .setOAuthAccessTokenSecret(accessTokenSecret)
+      .setIncludeMyRetweetEnabled(false)
+      .setUserStreamRepliesAllEnabled(false)
+    val authorization = new OAuthAuthorization(confBuild.build) //crea struttura di autenticazione
+
     //crea lo stream per scaricare i tweet applicando o meno un filtro
     val tweetsDownload = if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
+    val tweetFilter = tweetsDownload.filter(_.getLang() == "en")
+
     //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
-
-    tweetsDownload.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput + "tweetAfter") } //salva su file i tweet
-
-    //    val tweetFilter = tweetsDownload.filter(t => if (t.getRetweetedStatus != null) t.getRetweetedStatus.getInReplyToUserId() == -1 else t.getInReplyToUserId() == -1)
-    val tweetFilter = tweetsDownload.filter(t => if (t.getRetweetedStatus != null) false else t.getInReplyToUserId() == -1)
-
-    tweetFilter.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput + "tweetBefore") } //salva su file i tweet
-
-    val tweetEdit = tweetFilter.map(t =>(t, t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+    val tweetEdit = tweetFilter.map(t => (t, t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       //      (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
@@ -78,7 +78,6 @@ object ScalaTweetAnalysis7 {
       .appName("twitter trying")
       .getOrCreate()
 
-
     val data = tweetEdit.map(t => for (a <- t._4.split(" ")) if (!a.equals("")) hashtagCounterMap += a -> (hashtagCounterMap.getOrElse(a, 0) + 1))
     data.foreachRDD { rdd => rdd.collect() }
     if (!numRun.equals("Run1")) {
@@ -86,14 +85,14 @@ object ScalaTweetAnalysis7 {
       tweetEdit.foreachRDD { rdd =>
         import spark.implicits._
         val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
-        dataFrame.select("hashtags").show()
+        //        dataFrame.select("hashtags").show()
 
         dataFrame.createOrReplaceTempView("dataFrame")
         val text2 = spark.sql("SELECT hashtags, sentiment FROM dataFrame")
-        text2.show(50, false)
+        //        text2.show(50, false)
         for (a <- hashtagCounterMap) {
-          println("ioconto")
-          println(hashtagCounterMap.size)
+          //          println("ioconto")
+          //          println(hashtagCounterMap.size)
           val listPositionsApostrofo = indexesOf(a._1, "'")
           var keyParsedA = a._1
           for (c <- listPositionsApostrofo) {
@@ -110,8 +109,8 @@ object ScalaTweetAnalysis7 {
           val sum4 = sum3 + sum2
 
           hashtagSentimentMap += (a._1) -> sum4
-          println("chiave " + keyParsedA)
-          sentiment.show(50, false)
+          //          println("chiave " + keyParsedA)
+          //          sentiment.show(50, false)
           var bool = false
           for (b <- hashtagCounterMap) {
             if (bool) {
@@ -122,7 +121,7 @@ object ScalaTweetAnalysis7 {
               }
               val links = spark.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %' AND hashtags LIKE '% " + keyParsedB + " %'")
 
-              links.show(50, false)
+              //              links.show(50, false)
               val tipo2: Long = links.head().getLong(0)
 
               if (tipo2 != 0) {
@@ -135,48 +134,27 @@ object ScalaTweetAnalysis7 {
               bool = true
             }
           }
-          //  println(a._1)
-          //  val teenagers = sqlContext.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %'")
-          //   teenagers.show(50, false)
-          //  val tipo: Long = teenagers.head().getLong(0)
         }
-
-        //  val countTweet = dataFrame.count()
-        // println("\n\n\n\nNumero Tweet " + countTweet +  "\n\n\n")
         rdd.collect()
       }
     }
 
-    //avvia lo stream e la computazione dei tweet
-    ssc.start()
+    ssc.start() //avvia lo stream e la computazione dei tweet
+
     //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
+    // todo Exception in thread "streaming-job-executor-0" java.lang.Error: java.lang.InterruptedException
     ssc.awaitTerminationOrTimeout(if (numRun.equals("Run1")) timeRun(0).toLong else timeRun(1).toLong)
 
-    ssc.stop()
+    ssc.stop() //ferma lo StreamingContext
 
-    println("eee")
     println(hashtagCounterMap)
     println(edgeMap)
-    val avrSentiment = hashtagSentimentMap map { case (a, b) => (a, b / hashtagCounterMap.getOrElse(a, 0).toFloat) }
-    println(avrSentiment)
-    //ssc.awaitTerminationOrTimeout(300000) //5 min
+    println(hashtagSentimentMap)
 
-    //    for ((k,v) <- hashtagCounterMap) println(s"key: $k, value: $v")
     if (numRun.equals("Run1"))
       writeFile(pathOutput + "HashtagRun2", getTopHashtag())
     else
       graphComputation(pathOutput)
-  }
-
-  def indexesOf(source: String, target: String, index: Int = 0, withinOverlaps: Boolean = false): List[Int] = {
-    @tailrec def recursive(indexTarget: Int, accumulator: List[Int]): List[Int] = {
-      val position = source.indexOf(target, indexTarget)
-      if (position == -1) accumulator
-      else
-        recursive(position + (if (withinOverlaps) 1 else target.size), position :: accumulator)
-    }
-
-    recursive(index, Nil).reverse
   }
 
   /**
@@ -226,6 +204,24 @@ object ScalaTweetAnalysis7 {
 
   /**
     *
+    * @param source
+    * @param target
+    * @param index
+    * @param withinOverlaps
+    * @return
+    */
+  def indexesOf(source: String, target: String, index: Int = 0, withinOverlaps: Boolean = false): List[Int] = {
+    @tailrec def recursive(indexTarget: Int, accumulator: List[Int]): List[Int] = {
+      val position = source.indexOf(target, indexTarget)
+      if (position == -1) accumulator
+      else
+        recursive(position + (if (withinOverlaps) 1 else target.size), position :: accumulator)
+    }
+    recursive(index, Nil).reverse
+  }
+
+  /**
+    *
     * @param pathOutput
     */
   def graphComputation(pathOutput: String): Unit = {
@@ -234,7 +230,7 @@ object ScalaTweetAnalysis7 {
     val numberHashtag = hashtagCounterMap.size
     var count = 0
     var textBubbleChart = "var dataset = {\n    \"children\": ["
-    var textGraph = "{\n  \"nodes\": ["
+    var textGraph = "var dataset ={\n  \"nodes\": ["
     for (i <- hashtagCounterMap) {
       count += 1
       orderKnots += i._1 -> count
@@ -243,7 +239,7 @@ object ScalaTweetAnalysis7 {
       textBubbleChart += "\n        }"
 
       textGraph += "\n    {\n      \"name\": \"" + i._1
-      textGraph += "\",\n      \"group\": " + count //i._2._2.toString
+      textGraph += "\",\n      \"group\": " + hashtagSentimentMap.getOrElse(i._1, 3) //todo 3 ipotesi mixed
       textGraph += "\n    }"
 
       if (count != numberHashtag) {
@@ -260,8 +256,8 @@ object ScalaTweetAnalysis7 {
     val numberEdge = edgeMap.size
     count = 0
     for (i <- edgeMap) {
-      val x1 = orderKnots.getOrElse(i._1._1, 0)
-      val x2 = orderKnots.getOrElse(i._1._2, 0)
+      val x1 = orderKnots.getOrElse(i._1._1, 1) -1
+      val x2 = orderKnots.getOrElse(i._1._2, 1) -1
       count += 1
       textGraph += "\n    {\n      \"source\": " + x1
       textGraph += ",\n      \"target\": " + x2
@@ -269,8 +265,8 @@ object ScalaTweetAnalysis7 {
       textGraph += "\n    }"
       if (count != numberEdge) textGraph += ","
     }
-    textGraph += "\n  ]\n}"
-    writeFile(pathOutput + "datiGraph.json", textGraph)
+    textGraph += "\n  ]\n};"
+    writeFile(pathOutput + "datiGraph.js", textGraph)
   }
 }
 
@@ -293,6 +289,10 @@ tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStat
   .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
   .map(t => TweetStruc.tweetStuctString(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
   .foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
+
+
+
+val tweetFilter = tweetsDownload.filter(t => if (t.getRetweetedStatus != null) t.getRetweetedStatus.getInReplyToUserId() == -1 else t.getInReplyToUserId() == -1)
 
 */
 

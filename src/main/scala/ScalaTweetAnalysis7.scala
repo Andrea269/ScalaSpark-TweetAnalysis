@@ -1,16 +1,14 @@
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
+import twitter4j.Status
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
-
-import scala.annotation.tailrec
-import org.apache.log4j.Logger
-import org.apache.log4j.Level
-
 
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
@@ -25,32 +23,93 @@ object ScalaTweetAnalysis7 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
-    if (args.length < 7) {
-      //controlla che tutti i parametri necessari siano stati forniti in input
+    if (args.length < 7) {//controlla che tutti i parametri necessari siano stati forniti in input
       System.err.println("Provide input:<ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret><pathInput><pathOutput><numberRun>")
       System.exit(1)
     }
+    val pathInput = args(4)
+    val pathOutput = args(5)
+    val numRun = args(6)
     val sparkConf = new SparkConf() //configura spark
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
     val sc = new SparkContext(sparkConf)
+    downloadComputeTweet(sc, args, pathInput, numRun) //esegue il download e la computazione dei tweet
+    if (numRun.equals("Run1"))
+      writeFile(pathOutput + "HashtagRun2", getTopHashtag)
+    else
+      graphComputation(pathOutput)
 
-    downloadTweet(sc, args) //avvia il download
+    println(hashtagCounterMap)
+    println(edgeMap)
+    println(hashtagSentimentMap)
+
   }
 
   /**
     *
-    * @param sc   SparkContext
-    * @param args consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput, numRun
+    * @param sc SparkContext
+    * @param args consumerKey, consumerKeySecret, accessToken, accessTokenSecret
+    * @param pathInput path input file
+    * @param numRun number Run
     */
-  def downloadTweet(sc: SparkContext, args: Array[String]) = {
-    //leggo dai parametri passati dall'utente le 4 chiavi twitter
-    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret, pathInput, pathOutput, numRun) = args.take(7)
-    //crea il contesto di streaming con un intervallo di 15 secondi
-    val ssc = new StreamingContext(sc, Seconds(10))
-    //leggo il nome del file ed estrapolo gli hashtag da ricercare
-    val pathFilter = if (numRun.equals("Run1")) pathInput + "HashtagRun1" else pathInput + "HashtagRun2"
-    var filters = readFile(pathFilter).map(t => " " + t + " ")
+  def downloadComputeTweet(sc: SparkContext, args: Array[String], pathInput: String, numRun: String): Unit = {
+    val ssc = new StreamingContext(sc, Seconds(10)) //crea il contesto di streaming con un intervallo di X secondi
     var timeRun = readFile(pathInput + "Time").map(t => t.split("=")(1))
+    val pathFilter = if (numRun.equals("Run1")) pathInput + "HashtagRun1" else pathInput + "HashtagRun2" //leggo gli hashtag da ricercare
+    val tweetsDownload = downloadTweet(ssc, args, pathFilter).filter(_.getLang() == "en")
+    val tweetEdit = tweetsDownload.map(t => (t, t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
+      .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
+
+    val spark = SparkSession.builder.appName("twitter trying").getOrCreate()
+    val data = tweetEdit.map(t => for (a <- t._4.split(" ")) if (!a.equals("")) hashtagCounterMap += a -> (hashtagCounterMap.getOrElse(a, 0) + 1))
+    data.foreachRDD { rdd => rdd.collect() }
+    if (!numRun.equals("Run1")) {
+      tweetEdit.foreachRDD { rdd =>
+        import spark.implicits._
+        val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
+        dataFrame.createOrReplaceTempView("dataFrame")
+        var keyParsedA: String = ""
+        var keyParsedB: String = ""
+        var countSentiment: Long = 0
+        var count = 0
+        val numHashtag = hashtagCounterMap.size
+        for (a <- hashtagCounterMap) {
+          count += 1
+          countSentiment = hashtagSentimentMap.getOrElse(a._1, 0)
+          keyParsedA = a._1.replace("'", "''")
+          val sentimentSum = spark.sql("SELECT SUM(sentiment) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %'").head()
+          if (!sentimentSum.anyNull) countSentiment += sentimentSum.getLong(0)
+          hashtagSentimentMap += a._1 -> countSentiment
+          for (b <- hashtagCounterMap.slice(count, numHashtag)) {
+            keyParsedB = b._1.replace("'", "''")
+            val links = spark.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %' AND hashtags LIKE '% " + keyParsedB + " %'").head().getLong(0)
+            if (links != 0) {
+              val countLinks: Long = edgeMap.getOrElse((a._1, b._1), 0)
+              val totLinks = countLinks + links
+              edgeMap += (a._1, b._1) -> totLinks
+            }
+          }
+        }
+        rdd.collect()
+      }
+    }
+    ssc.start() //avvia lo stream e la computazione dei tweet
+    Thread.sleep(if (numRun.equals("Run1")) timeRun(0).toLong else timeRun(1).toLong)//setta il tempo di esecuzione
+    ssc.stop(true, true) //ferma lo StreamingContext
+  }
+
+  /**
+    * crea lo stream per scaricare i tweet applicando o meno un filtro
+    * @param ssc
+    * @param args
+    * @param pathFilter
+    * @return
+    */
+  def downloadTweet(ssc: StreamingContext, args: Array[String], pathFilter: String): ReceiverInputDStream[Status] = {
+    //leggo dai parametri passati dall'utente le 4 chiavi twitter
+    val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
+    var filters = readFile(pathFilter).map(t => " " + t + " ")
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso e le Info dell'Api
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true)
@@ -64,97 +123,7 @@ object ScalaTweetAnalysis7 {
     val authorization = new OAuthAuthorization(confBuild.build) //crea struttura di autenticazione
 
     //crea lo stream per scaricare i tweet applicando o meno un filtro
-    val tweetsDownload = if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
-    val tweetFilter = tweetsDownload.filter(_.getLang() == "en")
-
-    //crea un rdd dove ad ogni tweet è associato un oggetto contenente le sue info
-    val tweetEdit = tweetFilter.map(t => (t, t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
-      //      (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
-      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-      .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-
-    val spark = SparkSession
-      .builder
-      .appName("twitter trying")
-      .getOrCreate()
-
-    val data = tweetEdit.map(t => for (a <- t._4.split(" ")) if (!a.equals("")) hashtagCounterMap += a -> (hashtagCounterMap.getOrElse(a, 0) + 1))
-    data.foreachRDD { rdd => rdd.collect() }
-    if (!numRun.equals("Run1")) {
-
-      tweetEdit.foreachRDD { rdd =>
-        import spark.implicits._
-        val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
-        //        dataFrame.select("hashtags").show()
-
-        dataFrame.createOrReplaceTempView("dataFrame")
-        val text2 = spark.sql("SELECT hashtags, sentiment FROM dataFrame")
-        //        text2.show(50, false)
-        for (a <- hashtagCounterMap) {
-          //          println("ioconto")
-          //          println(hashtagCounterMap.size)
-          val listPositionsApostrofo = indexesOf(a._1, "'")
-          var keyParsedA = a._1
-          for (c <- listPositionsApostrofo) {
-            keyParsedA = a._1.patch(c, "'", 0)
-          }
-
-          val sentiment = spark.sql("SELECT SUM(sentiment) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %'")
-          var sum2: Long = 0
-          val isNull = sentiment.head().anyNull
-          if (!isNull) {
-            sum2 = sentiment.head.getLong(0)
-          }
-          val sum3: Long = hashtagSentimentMap.getOrElse((a._1), 0)
-          val sum4 = sum3 + sum2
-
-          hashtagSentimentMap += (a._1) -> sum4
-          //          println("chiave " + keyParsedA)
-          //          sentiment.show(50, false)
-          var bool = false
-          for (b <- hashtagCounterMap) {
-            if (bool) {
-              val listPositionsApostrofo = indexesOf(b._1, "'")
-              var keyParsedB = b._1
-              for (c <- listPositionsApostrofo) {
-                keyParsedB = b._1.patch(c, "'", 0)
-              }
-              val links = spark.sql("SELECT COUNT(id) FROM dataFrame WHERE hashtags LIKE '% " + keyParsedA + " %' AND hashtags LIKE '% " + keyParsedB + " %'")
-
-              //              links.show(50, false)
-              val tipo2: Long = links.head().getLong(0)
-
-              if (tipo2 != 0) {
-                val tipo3: Long = edgeMap.getOrElse((a._1, b._1), 0)
-                val tipo4 = tipo3 + tipo2
-                edgeMap += (a._1, b._1) -> tipo4
-              }
-            }
-            if (a._1.equals(b._1)) { //per evitare ripetizioni tuple con gli elementi invertiti
-              bool = true
-            }
-          }
-        }
-        rdd.collect()
-      }
-    }
-
-    ssc.start() //avvia lo stream e la computazione dei tweet
-
-    //setta il tempo di esecuzione altrimenti scaricherebbe tweet all'infinito
-    // todo Exception in thread "streaming-job-executor-0" java.lang.Error: java.lang.InterruptedException
-    ssc.awaitTerminationOrTimeout(if (numRun.equals("Run1")) timeRun(0).toLong else timeRun(1).toLong)
-
-    ssc.stop() //ferma lo StreamingContext
-
-    println(hashtagCounterMap)
-    println(edgeMap)
-    println(hashtagSentimentMap)
-
-    if (numRun.equals("Run1"))
-      writeFile(pathOutput + "HashtagRun2", getTopHashtag())
-    else
-      graphComputation(pathOutput)
+    if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
   }
 
   /**
@@ -181,7 +150,7 @@ object ScalaTweetAnalysis7 {
     * @param filename
     * @param text
     */
-  def writeFile(filename: String, text: String) = {
+  def writeFile(filename: String, text: String): Unit = {
     val hadoopPath = new Path(filename)
     val outputPath: FSDataOutputStream = hadoopPath.getFileSystem(new Configuration()).create(hadoopPath)
     val wrappedStream = outputPath.getWrappedStream
@@ -195,29 +164,11 @@ object ScalaTweetAnalysis7 {
     *
     * @return
     */
-  def getTopHashtag(): String = {
+  def getTopHashtag: String = {
     val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
     var topHashtag = ""
     for (i <- 0 until orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
     topHashtag
-  }
-
-  /**
-    *
-    * @param source
-    * @param target
-    * @param index
-    * @param withinOverlaps
-    * @return
-    */
-  def indexesOf(source: String, target: String, index: Int = 0, withinOverlaps: Boolean = false): List[Int] = {
-    @tailrec def recursive(indexTarget: Int, accumulator: List[Int]): List[Int] = {
-      val position = source.indexOf(target, indexTarget)
-      if (position == -1) accumulator
-      else
-        recursive(position + (if (withinOverlaps) 1 else target.size), position :: accumulator)
-    }
-    recursive(index, Nil).reverse
   }
 
   /**
@@ -239,7 +190,7 @@ object ScalaTweetAnalysis7 {
       textBubbleChart += "\n        }"
 
       textGraph += "\n    {\n      \"name\": \"" + i._1
-      textGraph += "\",\n      \"group\": " + hashtagSentimentMap.getOrElse(i._1, 3) //todo 3 ipotesi mixed
+      textGraph += "\",\n      \"group\": " + hashtagSentimentMap.getOrElse(i._1, 2)
       textGraph += "\n    }"
 
       if (count != numberHashtag) {
@@ -256,8 +207,8 @@ object ScalaTweetAnalysis7 {
     val numberEdge = edgeMap.size
     count = 0
     for (i <- edgeMap) {
-      val x1 = orderKnots.getOrElse(i._1._1, 1) -1
-      val x2 = orderKnots.getOrElse(i._1._2, 1) -1
+      val x1 = orderKnots.getOrElse(i._1._1, 1) - 1
+      val x2 = orderKnots.getOrElse(i._1._2, 1) - 1
       count += 1
       textGraph += "\n    {\n      \"source\": " + x1
       textGraph += ",\n      \"target\": " + x2
@@ -268,32 +219,18 @@ object ScalaTweetAnalysis7 {
     textGraph += "\n  ]\n};"
     writeFile(pathOutput + "datiGraph.js", textGraph)
   }
+//
+//  /**
+//    *
+//    * @param block
+//    * @tparam R
+//    * @return
+//    */
+//  def time[R](block: => R): R = {
+//    val t0 = System.nanoTime()
+//    val result = block    // call-by-name
+//    val t1 = System.nanoTime()
+//    println("Elapsed time: " + (t1 - t0) + "ns")
+//    result
+//  }
 }
-
-
-/*
-tweetsDownload.foreachRDD { rdd =>
-  rdd.map(t => (
-    t, //tweet
-    if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText // testo del tweet
-  ))
-    .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-    .map(t => TweetStruc.tweetStuctString(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-    .saveAsTextFile("OUT/tweets") //salva su file i tweet "OUT/tweets"
-  //        .persist()
-}
-
-tweetEdit.foreachRDD { rdd => rdd.saveAsTextFile(pathOutput) } //salva su file i tweet
-
-tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))//coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
-  .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-  .map(t => TweetStruc.tweetStuctString(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-  .foreachRDD { rdd => rdd.saveAsTextFile("OUT/tweets") } //salva su file i tweet
-
-
-
-val tweetFilter = tweetsDownload.filter(t => if (t.getRetweetedStatus != null) t.getRetweetedStatus.getInReplyToUserId() == -1 else t.getInReplyToUserId() == -1)
-
-*/
-
-//todo tweet in risposta senza hashtag vengono comunque presi

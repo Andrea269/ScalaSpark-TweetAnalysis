@@ -137,3 +137,34 @@ p.error{
     stroke-width:3px;
     fill:#555;
 }
+
+.verypositive {
+    width:20px;
+    height:20px;
+    border-radius:50px;
+    background:#009933;
+}
+.positive {
+    width:20px;
+    height:20px;
+    border-radius:50px;
+    background:#4CA64C;
+}
+.mixed {
+    width:20px;
+    height:20px;
+    border-radius:50px;
+    background:#0000FF;
+}
+.negative {
+    width:20px;
+    height:20px;
+    border-radius:50px;
+    background:#FF4C4C;
+}
+.verynegative {
+    width:20px;
+    height:20px;
+    border-radius:50px;
+    background:#FF0000;
+}

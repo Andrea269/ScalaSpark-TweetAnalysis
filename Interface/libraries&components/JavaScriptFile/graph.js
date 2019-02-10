@@ -1,6 +1,5 @@
 app = angular.module('graphApp', []);
 
-
 app.controller('graphController', function ($scope, graphService) {
     $scope.viewResult = null;
 
@@ -12,7 +11,9 @@ app.controller('graphController', function ($scope, graphService) {
         var width = 960,
             height = 600;
 
-        var color = d3.scale.category20();
+        var color = d3.scale.ordinal()
+            .domain(["1", "2", "3", "4", "5"])
+            .range(["#009933", "#4CA64C", "#0000FF", "#FF4C4C", "#FF0000"]);
 
         var force = d3.layout.force()
             .gravity(.05)

@@ -12,8 +12,8 @@ app.controller('graphController', function ($scope, graphService) {
             height = 600;
 
         var color = d3.scale.ordinal()
-            .domain(["1", "2", "3", "4", "5"])
-            .range(["#009933", "#4CA64C", "#0000FF", "#FF4C4C", "#FF0000"]);
+            .domain(["0", "1", "2", "3", "4"])
+            .range(["#008000", "#00ff00", "#ffff00", "#FF4C4C", "#FF0000"]);
 
         var force = d3.layout.force()
             .gravity(.05)

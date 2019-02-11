@@ -142,29 +142,29 @@ p.error{
     width:20px;
     height:20px;
     border-radius:50px;
-    background:#009933;
+    background:#008000;
 }
 .positive {
     width:20px;
     height:20px;
     border-radius:50px;
-    background:#4CA64C;
+    background:#00ff00;
 }
-.mixed {
+.neutral {
     width:20px;
     height:20px;
     border-radius:50px;
-    background:#0000FF;
+    background:#ffff00;
 }
 .negative {
     width:20px;
     height:20px;
     border-radius:50px;
-    background:#FF4C4C;
+    background:#FF0000;
 }
 .verynegative {
     width:20px;
     height:20px;
     border-radius:50px;
-    background:#FF0000;
+    background:#800000;
 }

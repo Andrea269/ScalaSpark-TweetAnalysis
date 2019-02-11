@@ -15,6 +15,7 @@ object ScalaTweetAnalysis7 {
   var hashtagSentimentMap: Map[String, Long] = scala.collection.immutable.Map[String, Long]()
   var edgeMap: Map[(String, String), Long] = scala.collection.immutable.Map[(String, String), Long]()
   val percent: Int = 30
+  val thresholdLink: Int = 0
 
   /**
     *
@@ -23,7 +24,8 @@ object ScalaTweetAnalysis7 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
-    if (args.length < 7) {//controlla che tutti i parametri necessari siano stati forniti in input
+    if (args.length < 7) {
+      //controlla che tutti i parametri necessari siano stati forniti in input
       System.err.println("Provide input:<ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret><pathInput><pathOutput><numberRun>")
       System.exit(1)
     }
@@ -42,25 +44,24 @@ object ScalaTweetAnalysis7 {
     println(hashtagCounterMap)
     println(edgeMap)
     println(hashtagSentimentMap)
-
   }
 
   /**
     *
-    * @param sc SparkContext
-    * @param args consumerKey, consumerKeySecret, accessToken, accessTokenSecret
+    * @param sc        SparkContext
+    * @param args      consumerKey, consumerKeySecret, accessToken, accessTokenSecret
     * @param pathInput path input file
-    * @param numRun number Run
+    * @param numRun    number Run
     */
   def downloadComputeTweet(sc: SparkContext, args: Array[String], pathInput: String, numRun: String): Unit = {
     val ssc = new StreamingContext(sc, Seconds(10)) //crea il contesto di streaming con un intervallo di X secondi
     var timeRun = readFile(pathInput + "Time").map(t => t.split("=")(1))
     val pathFilter = if (numRun.equals("Run1")) pathInput + "HashtagRun1" else pathInput + "HashtagRun2" //leggo gli hashtag da ricercare
     val tweetsDownload = downloadTweet(ssc, args, pathFilter).filter(_.getLang() == "en")
-    val tweetEdit = tweetsDownload.map(t => (t, t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
+    val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-
+    tweetsDownload.foreachRDD(rdd => rdd.saveAsTextFile(pathInput+"tweet"))//todo cancellel
     val spark = SparkSession.builder.appName("twitter trying").getOrCreate()
     val data = tweetEdit.map(t => for (a <- t._4.split(" ")) if (!a.equals("")) hashtagCounterMap += a -> (hashtagCounterMap.getOrElse(a, 0) + 1))
     data.foreachRDD { rdd => rdd.collect() }
@@ -95,12 +96,13 @@ object ScalaTweetAnalysis7 {
       }
     }
     ssc.start() //avvia lo stream e la computazione dei tweet
-    Thread.sleep(if (numRun.equals("Run1")) timeRun(0).toLong else timeRun(1).toLong)//setta il tempo di esecuzione
+    Thread.sleep(if (numRun.equals("Run1")) timeRun(0).toLong else timeRun(1).toLong) //setta il tempo di esecuzione
     ssc.stop(true, true) //ferma lo StreamingContext
   }
 
   /**
     * crea lo stream per scaricare i tweet applicando o meno un filtro
+    *
     * @param ssc
     * @param args
     * @param pathFilter
@@ -113,11 +115,11 @@ object ScalaTweetAnalysis7 {
     //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso e le Info dell'Api
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true)
-      .setTweetModeExtended(true)
       .setOAuthConsumerKey(consumerKey)
       .setOAuthConsumerSecret(consumerKeySecret)
       .setOAuthAccessToken(accessToken)
       .setOAuthAccessTokenSecret(accessTokenSecret)
+      .setTweetModeExtended(true)
       .setIncludeMyRetweetEnabled(false)
       .setUserStreamRepliesAllEnabled(false)
     val authorization = new OAuthAuthorization(confBuild.build) //crea struttura di autenticazione
@@ -177,7 +179,6 @@ object ScalaTweetAnalysis7 {
     */
   def graphComputation(pathOutput: String): Unit = {
     var orderKnots: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
-
     val numberHashtag = hashtagCounterMap.size
     var count = 0
     var textBubbleChart = "var dataset = {\n    \"children\": ["
@@ -202,11 +203,9 @@ object ScalaTweetAnalysis7 {
     writeFile(pathOutput + "datiBubbleChart.js", textBubbleChart)
 
     textGraph += "\n  ],\n  \"links\": ["
-
-
     val numberEdge = edgeMap.size
     count = 0
-    for (i <- edgeMap) {
+    for (i <- edgeMap.filter(_._2 > thresholdLink)) {
       val x1 = orderKnots.getOrElse(i._1._1, 1) - 1
       val x2 = orderKnots.getOrElse(i._1._2, 1) - 1
       count += 1
@@ -219,18 +218,19 @@ object ScalaTweetAnalysis7 {
     textGraph += "\n  ]\n};"
     writeFile(pathOutput + "datiGraph.js", textGraph)
   }
-//
-//  /**
-//    *
-//    * @param block
-//    * @tparam R
-//    * @return
-//    */
-//  def time[R](block: => R): R = {
-//    val t0 = System.nanoTime()
-//    val result = block    // call-by-name
-//    val t1 = System.nanoTime()
-//    println("Elapsed time: " + (t1 - t0) + "ns")
-//    result
-//  }
+
+  //
+  //  /**
+  //    *
+  //    * @param block
+  //    * @tparam R
+  //    * @return
+  //    */
+  //  def time[R](block: => R): R = {
+  //    val t0 = System.nanoTime()
+  //    val result = block    // call-by-name
+  //    val t1 = System.nanoTime()
+  //    println("Elapsed time: " + (t1 - t0) + "ns")
+  //    result
+  //  }
 }

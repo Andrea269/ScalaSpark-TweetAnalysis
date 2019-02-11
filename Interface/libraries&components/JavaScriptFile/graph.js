@@ -13,11 +13,11 @@ app.controller('graphController', function ($scope, graphService) {
 
         var color = d3.scale.ordinal()
             .domain(["0", "1", "2", "3", "4"])
-            .range(["#008000", "#00ff00", "#ffff00", "#FF4C4C", "#FF0000"]);
+            .range(["#008000", "#00ff00", "#ffff00", "#FF0000", "#800000"]);
 
         var force = d3.layout.force()
             .gravity(.05)
-            .distance(100)
+            .distance(200)
             .charge(-100)
             .size([width, height]);
 

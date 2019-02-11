@@ -61,7 +61,7 @@ object ScalaTweetAnalysis7 {
     val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-    tweetsDownload.foreachRDD(rdd => rdd.saveAsTextFile(pathInput+"tweet"))//todo cancellel
+//    tweetsDownload.foreachRDD(rdd => rdd.saveAsTextFile(pathInput+"tweet"))//todo cancel
     val spark = SparkSession.builder.appName("twitter trying").getOrCreate()
     val data = tweetEdit.map(t => for (a <- t._4.split(" ")) if (!a.equals("")) hashtagCounterMap += a -> (hashtagCounterMap.getOrElse(a, 0) + 1))
     data.foreachRDD { rdd => rdd.collect() }

@@ -18,7 +18,11 @@ object TweetStruc {
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String):
   (Long, String, Int, String, String, String, String, String) = {
+    count+= 1
+    println(count)
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
+    println(tweet.toString("Tweet: "))
+
     (tweet.getId, tweet.getText, tweet.getSentiment, tweet.getHashtags, tweet.getUserMentioned, tweet.getUser, tweet.getCreated_at, tweet.getLanguage)
   }
 

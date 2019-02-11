@@ -10,6 +10,8 @@ import twitter4j.Status
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
+//TODO un hashtag deve essere formato solo da lettere e numeri
+
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
   var hashtagSentimentMap: Map[String, Long] = scala.collection.immutable.Map[String, Long]()
@@ -54,27 +56,24 @@ object ScalaTweetAnalysis7 {
     * @param numRun    number Run
     */
   def downloadComputeTweet(sc: SparkContext, args: Array[String], pathInput: String, numRun: String): Unit = {
-    val ssc = new StreamingContext(sc, Seconds(10)) //crea il contesto di streaming con un intervallo di X secondi
+    val ssc = new StreamingContext(sc, Seconds(1)) //crea il contesto di streaming con un intervallo di X secondi
     var timeRun = readFile(pathInput + "Time").map(t => t.split("=")(1))
     val pathFilter = if (numRun.equals("Run1")) pathInput + "HashtagRun1" else pathInput + "HashtagRun2" //leggo gli hashtag da ricercare
     val tweetsDownload = downloadTweet(ssc, args, pathFilter).filter(_.getLang() == "en")
 
-
-
-
     val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
       .map(t => TweetStruc.tweetStuct(t._1.getId, t._2, t._1.getUser.getScreenName, t._1.getCreatedAt.toInstant.toString, t._1.getLang)) //crea la struttura del tweet
-        .persist()
+      .persist()
 
+    tweetsDownload.foreachRDD(rdd => rdd.saveAsTextFile(pathInput + "tweet"))//todo cancel
 
-
-    tweetsDownload.foreachRDD(rdd => rdd.saveAsTextFile(pathInput+"tweet"))//todo cancel
     val spark = SparkSession.builder.appName("twitter trying").getOrCreate()
     val data = tweetEdit.map(t => for (a <- t._4.split(" ")) if (!a.equals("")) hashtagCounterMap += a -> (hashtagCounterMap.getOrElse(a, 0) + 1))
     data.foreachRDD { rdd => rdd.collect() }
-    if (!numRun.equals("Run1")) {
+    if (numRun.equals("Run2")) {
       tweetEdit.foreachRDD { rdd =>
+        println("aaa\n\n\n\n")
         import spark.implicits._
         val dataFrame = rdd.toDF("id", "text", "sentiment", "hashtags", "userMentioned", "user", "createAt", "language")
         dataFrame.createOrReplaceTempView("dataFrame")
@@ -84,6 +83,7 @@ object ScalaTweetAnalysis7 {
         var count = 0
         val numHashtag = hashtagCounterMap.size
         for (a <- hashtagCounterMap) {
+          println("\n\n\n\n"+a+"\n\n\n\n")
           count += 1
           countSentiment = hashtagSentimentMap.getOrElse(a._1, 0)
           keyParsedA = a._1.replace("'", "''")

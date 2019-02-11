@@ -1,5 +1,6 @@
 object TweetStruc {
   private var tweet: TweetClass = _
+  var count= 0
 
   /**
     *

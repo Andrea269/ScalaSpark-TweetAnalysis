@@ -1,6 +1,6 @@
 object TweetStruc {
   private var tweet: TweetClass = _
-  var count= 0
+  var count = 0
 
   /**
     *
@@ -18,7 +18,7 @@ object TweetStruc {
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String):
   (Long, String, Int, String, String, String, String, String) = {
-    count+= 1
+    count += 1
     println(count)
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
     println(tweet.toString("Tweet: "))
@@ -27,10 +27,11 @@ object TweetStruc {
   }
 
 
-  def tweetStuctString(idT: Long, textT: String, userT: String, createdT: String, langT: String):  String = {
+  def tweetStuctString(idT: Long, textT: String, userT: String, createdT: String, langT: String): String = {
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
     tweet.toString("Tweet: ")
   }
+
   /**
     *
     * @param heading
@@ -61,11 +62,12 @@ object TweetStruc {
     private val hashtags: Array[String] = extractHashtags(textT.toString) //estrae gli hashtag del testo del tweet
     private val listUserMentioned: Array[String] = userMentioned(textT.toString)
     private val user: String = userT.toString
-    private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
+    private val creationDate: Map[String, String] = Map("ciao" -> "ciao")
+    //todo RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
-//    val sentimentTweet: Int =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
-    val sentimentTweet: Int =if(textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
+    //    val sentimentTweet: Int =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
+    val sentimentTweet: Int = if (textTweet != null && textTweet != " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
     def getId: Long = id
 
     def getText: String = textTweet
@@ -84,23 +86,24 @@ object TweetStruc {
 
     /**
       * Formato data: 2019-01-20T09:00:13Z
+      *
       * @param date
       * @return
       */
-    def RefactoringDate(date: String):  Map[String, String] = {
+    def RefactoringDate(date: String): Map[String, String] = {
 
-      var returnDate: Map[String, String] =null
-      val splitDate= date.substring(0, date.length-1).split("T")
-      val splitDay= splitDate(0).split("-")
-      val splitTime= splitDate(1).split(":")
-      if(splitDay!=null && splitTime!=null && splitDay.length==3 && splitTime.length==3){
-        returnDate=Map(
-          "Year"->splitDay(0),
-          "Month"->splitDay(1),
-          "Day"->splitDay(2),
-          "Hours"->splitTime(0),
-          "Minutes"->splitTime(1),
-          "Seconds"->splitTime(2)
+      var returnDate: Map[String, String] = null
+      val splitDate = date.substring(0, date.length - 1).split("T")
+      val splitDay = splitDate(0).split("-")
+      val splitTime = splitDate(1).split(":")
+      if (splitDay != null && splitTime != null && splitDay.length == 3 && splitTime.length == 3) {
+        returnDate = Map(
+          "Year" -> splitDay(0),
+          "Month" -> splitDay(1),
+          "Day" -> splitDay(2),
+          "Hours" -> splitTime(0),
+          "Minutes" -> splitTime(1),
+          "Seconds" -> splitTime(2)
         )
       }
       returnDate
@@ -155,7 +158,11 @@ object TweetStruc {
       * @return
       */
     private def extractHashtags(input: String): Array[String] = {
-      extractText(input, "#")
+      var hashtag = extractText(input, "#")
+      for (i <- hashtag.indices) {
+        hashtag(i) = "#" + hashtag(i).split("[^\\w']+")(1) //accetta solo lettere e numeri + l'apostrofo
+      }
+      hashtag
     }
 
     /**
@@ -182,16 +189,17 @@ object TweetStruc {
 
     /**
       * elimina link, hashtag e utenti menzionati
+      *
       * @param input
       * @return
       */
     private def cleanText(input: String): String = {
       if (input == null) " " else
         input.split("\\s+") //(' ')|('\n')|('\t')|('\r')
-          .filterNot(p => p.length>4 && p.take(4).toString.equals("http"))
+          .filterNot(p => p.length > 4 && p.take(4).toString.equals("http"))
           //          .filterNot(p => p.length>1 && p(0).toString.equals("#"))
           //          .filterNot(p => p.length>1 && p(0).toString.equals("@"))
-          .foldLeft("")((x,y)=>x + " " + y)
+          .foldLeft("")((x, y) => x + " " + y)
     }
 
     /**
@@ -200,14 +208,14 @@ object TweetStruc {
       * @return
       */
     def toString(heading: String): String = heading +
-      "ID->" + id + "\n"+
-      "Text->" + textTweet + "\n"+
-      "Sentiment->" + sentimentTweet + "\n"+
-      "Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + "\n"+
-      "UserMentioned->" + listUserMentioned.foldLeft("")((x, y) => x + " " + y) + "\n"+
-      "User->" + user + "\n"+
-      "Time->" + creationDate + "\n"+
-      "Language->"+lang+"\n\n\n"
+      "ID->" + id + "\n" +
+      "Text->" + textTweet + "\n" +
+      "Sentiment->" + sentimentTweet + "\n" +
+      "Hashtag->" + hashtags.foldLeft("")((x, y) => x + " " + y) + "\n" +
+      "UserMentioned->" + listUserMentioned.foldLeft("")((x, y) => x + " " + y) + "\n" +
+      "User->" + user + "\n" +
+      "Time->" + creationDate + "\n" +
+      "Language->" + lang + "\n\n\n"
   }
 
 }

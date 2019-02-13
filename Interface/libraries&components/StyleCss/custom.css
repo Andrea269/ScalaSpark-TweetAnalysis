@@ -168,3 +168,28 @@ p.error{
     border-radius:50px;
     background:#800000;
 }
+
+/*.link {*/
+    /*stroke: #777;*/
+    /*stroke-opacity: 0.6;*/
+    /*stroke-width: 1.5px;*/
+/*}*/
+
+.node circle {
+    /*fill: #ccc;*/
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.node label {
+    display: none;
+    font: 10px sans-serif;
+}
+
+.node:hover circle {
+    fill: #000;
+}
+
+.node:hover label {
+    display: inline;
+}

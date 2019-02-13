@@ -1,11 +1,11 @@
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.{SparkConf, SparkContext}
 import twitter4j.Status
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
@@ -31,21 +31,26 @@ object ScalaTweetAnalysis7 {
       System.err.println("Provide input:<ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret><pathInput><pathOutput><numberRun>")
       System.exit(1)
     }
-    val pathInput = args(4)
-    val pathOutput = args(5)
-    val numRun = args(6)
-    val sparkConf = new SparkConf() //configura spark
-    sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
-    val sc = new SparkContext(sparkConf)
-    downloadComputeTweet(sc, args, pathInput, numRun) //esegue il download e la computazione dei tweet
-    if (numRun.equals("Run1"))
-      writeFile(pathOutput + "HashtagRun2", getTopHashtag)
-    else
-      graphComputation(pathOutput)
+    val x= TweetStruc.tweetStuct(145632, "fgdfg fg#ciao #ciao2w,3e ##ci3ao #####ddd #bell'cio2,f4 h c #b #cc11 #cc'22w", "saas","saas", "en")
+    println(x)
 
-    println(hashtagCounterMap)
-    println(edgeMap)
-    println(hashtagSentimentMap)
+
+//
+//    val pathInput = args(4)
+//    val pathOutput = args(5)
+//    val numRun = args(6)
+//    val sparkConf = new SparkConf() //configura spark
+//    sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
+//    val sc = new SparkContext(sparkConf)
+//    downloadComputeTweet(sc, args, pathInput, numRun) //esegue il download e la computazione dei tweet
+//    if (numRun.equals("Run1"))
+//      writeFile(pathOutput + "HashtagRun2", getTopHashtag)
+//    else
+//      graphComputation(pathOutput)
+//
+//    println(hashtagCounterMap)
+//    println(edgeMap)
+//    println(hashtagSentimentMap)
   }
 
   /**

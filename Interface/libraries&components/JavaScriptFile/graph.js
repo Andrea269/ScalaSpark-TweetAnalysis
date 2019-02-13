@@ -9,7 +9,7 @@ app.controller('graphController', function ($scope, graphService) {
         var loadDialog = document.getElementById("loading");
         loadDialog.showModal();
         var width = 960,
-            height = 600;
+            height = 1000;
 
         var color = d3.scale.ordinal()
             .domain(["0", "1", "2", "3", "4"])
@@ -17,7 +17,7 @@ app.controller('graphController', function ($scope, graphService) {
 
         var force = d3.layout.force()
             .gravity(.05)
-            .distance(200)
+            .distance(150)
             .charge(-100)
             .size([width, height]);
 
@@ -51,6 +51,7 @@ app.controller('graphController', function ($scope, graphService) {
                 return Math.sqrt(d.weight);
             });
 
+
         var node = svg.selectAll(".node")
             .data(dataset.nodes)
             .enter().append("g")
@@ -70,6 +71,11 @@ app.controller('graphController', function ($scope, graphService) {
                 return d.name
             });
 
+        var label = node.append("label")//todo
+            .attr("dx", -25)
+            .attr("dy", ".35em")
+            .text(function(d) { return d.group; });
+
         force.on("tick", function () {
             link
                 .attr("x1", function (d) {
@@ -88,6 +94,10 @@ app.controller('graphController', function ($scope, graphService) {
             node.attr("transform", function (d) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
+            label
+                .attr("x", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                .attr("y", function(d) { return "translate(" + d.x + "," + d.y + ")";});
+
         });
 
         $scope.viewResult = "active";

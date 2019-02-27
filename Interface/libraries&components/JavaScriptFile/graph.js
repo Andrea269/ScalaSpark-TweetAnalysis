@@ -70,12 +70,12 @@ app.controller('graphController', function ($scope, graphService) {
                 return d.name
             });
 
-        node.append("text")
-            .attr("class", "text2")
-            .attr("dx", 12)
-            .text(function (d) {
-                return d.label;
-            });
+        // node.append("text")
+        //     .attr("class", "text2")
+        //     .attr("dx", 12)
+        //     .text(function (d) {
+        //         return d.label;
+        //     });
 
         force.on("tick", function () {
             link

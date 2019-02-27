@@ -27,8 +27,6 @@ echo "==========================================================================
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"CLUSTER '${DATAPROC_CLUSTER_NAME}' STARTED!"
 echo "===================================================================================="
 
-efTcZmWVuIOC9gncfFBb4Fnav SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa 1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6 input/ Interface/GraphData/ Run2
-
 #run job 1
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
@@ -42,6 +40,18 @@ echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DO
 echo "===================================================================================="
 
 #run job 2
+echo "===================================================================================="
+echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
+echo "===================================================================================="
+gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
+      --class ${SCALA_RUNNABLE_CLASS} \
+      --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
+      -- efTcZmWVuIOC9gncfFBb4Fnav SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa 1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6 gs://bucket-twitter/input/ gs://bucket-twitter/input/ TypeRun1
+echo "===================================================================================="
+echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
+echo "===================================================================================="
+
+#run job 3 END
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
 echo "===================================================================================="

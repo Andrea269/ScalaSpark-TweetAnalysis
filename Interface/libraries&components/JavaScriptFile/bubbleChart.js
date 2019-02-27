@@ -8,7 +8,7 @@ app.controller('bubbleChartController', function ($scope, bubbleChartService) {
         var loadDialog = document.getElementById("loading");
         loadDialog.showModal();
 
-        var diameter = 600;
+        var diameter = 800;
         var color = d3.scaleOrdinal(d3.schemeCategory20);
 
         var bubble = d3.pack(dataset)
@@ -52,7 +52,7 @@ app.controller('bubbleChartController', function ($scope, bubbleChartService) {
             .attr("dy", ".2em")
             .style("text-anchor", "middle")
             .text(function(d) {
-                return d.data.name.substring(0, d.r / 3);
+                return d.data.name.substring(0, d.r / 4);
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function(d){

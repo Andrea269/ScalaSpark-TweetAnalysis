@@ -1,6 +1,5 @@
 object TweetStruc {
   private var tweet: TweetClass = _
-  var count = 0
 
   /**
     *
@@ -18,11 +17,8 @@ object TweetStruc {
     */
   def tweetStuct(idT: Long, textT: String, userT: String, createdT: String, langT: String):
   (Long, String, Int, String, String, String, String, String) = {
-    count += 1
-    println(count)
     tweet = new TweetClass(idT, textT, userT, createdT, langT)
-    println(tweet.toString("Tweet: "))
-
+//    println(tweet.toString("Tweet: "))
     (tweet.getId, tweet.getText, tweet.getSentiment, tweet.getHashtags, tweet.getUserMentioned, tweet.getUser, tweet.getCreated_at, tweet.getLanguage)
   }
 
@@ -62,8 +58,7 @@ object TweetStruc {
     private val hashtags: Array[String] = extractHashtags(textT.toString) //estrae gli hashtag del testo del tweet
     private val listUserMentioned: Array[String] = userMentioned(textT.toString)
     private val user: String = userT.toString
-    private val creationDate: Map[String, String] = Map("ciao" -> "ciao")
-    //todo RefactoringDate(createdT.toString)
+    private val creationDate: Map[String, String] = RefactoringDate(createdT.toString)
     private val lang: String = langT.toString
 
     //    val sentimentTweet: Int =if(lang=="en" && textTweet!= null && textTweet!= " ") computesSentiment(cleanText(textT.toString)) else 2 //calcola il sentimento del testo del tweet
@@ -74,7 +69,7 @@ object TweetStruc {
 
     def getSentiment: Int = sentimentTweet
 
-    def getHashtags: String = " " + hashtags.foldLeft("")((x, y) => x + " " + y) + " " //mettiamo gli spazi alla fine e all'inizio per fare la query SQL like
+    def getHashtags: String = hashtags.foldLeft(" ")((x, y) => x + " " + y) + " " //mettiamo gli spazi alla fine e all'inizio per fare la query SQL like
 
     def getUserMentioned: String = listUserMentioned.foldLeft("")((x, y) => x + " " + y)
 

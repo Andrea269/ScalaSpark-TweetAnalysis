@@ -122,22 +122,6 @@ p.error{
 }
 
 /*D3 Style*/
-
-.link {
-    stroke: #aaa;
-}
-
-.node text {
-    stroke:#333;
-    cursos:pointer;
-}
-
-.node circle{
-    stroke:#fff;
-    stroke-width:3px;
-    fill:#555;
-}
-
 .verypositive {
     width:20px;
     height:20px;
@@ -169,27 +153,37 @@ p.error{
     background:#800000;
 }
 
-/*.link {*/
-    /*stroke: #777;*/
-    /*stroke-opacity: 0.6;*/
-    /*stroke-width: 1.5px;*/
-/*}*/
-
 .node circle {
-    /*fill: #ccc;*/
-    stroke: #000;
+    stroke: #000000;
     stroke-width: 1.5px;
 }
+.node:active circle {
+    stroke: #0000ff;
+    stroke-width: 2.5px;
+}
 
-.node label {
+.link {
+    stroke: #777777;
+}
+.link2 {
+    display: none;
+    stroke: #d58512;
+}
+.node:active .link2 {
+    display: inline;
+}
+
+.node text {
+    stroke:#333;
+    cursos:pointer;
+}
+.text1 {
+    font: 10px sans-serif;
+}
+.text2 {
     display: none;
     font: 10px sans-serif;
 }
-
-.node:hover circle {
-    fill: #000;
-}
-
-.node:hover label {
+.node:active .text2 {
     display: inline;
 }

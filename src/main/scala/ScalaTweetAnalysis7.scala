@@ -13,7 +13,7 @@ import twitter4j.conf.ConfigurationBuilder
 
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
-  var hashtagSentimentMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
+  var hashtagSentimentMap: Map[String, (Int,Int)] = scala.collection.immutable.Map[String, (Int,Int)]()
   var edgeMap: Map[(String, String), Int] = scala.collection.immutable.Map[(String, String), Int]()
   val percent: Int = 30
   val thresholdLink: Int = 0
@@ -38,24 +38,17 @@ object ScalaTweetAnalysis7 {
     val sc = new SparkContext(sparkConf)
     downloadComputeTweet(sc, args) //esegue il download e la computazione dei tweet
 
-    println(hashtagCounterMap)
-    println(edgeMap)
-    println(hashtagSentimentMap)
-    println("\n\n")
-    if (numRun.equals("TypeRun1")) {
-      hashtagCounterMap = serializeMap(pathInput + "hashtagCounterMap", hashtagCounterMap, 1)
-      edgeMap = serializeMap(pathInput + "edgeMap", edgeMap.map(t => (t._1._1 + "," + t._1._2, t._2)), 1).map(t => ((t._1.split(",")(0), t._1.split(",")(1)), t._2))
-      hashtagSentimentMap = serializeMap(pathInput + "hashtagSentimentMap", hashtagSentimentMap, 2)
+//    println(hashtagCounterMap)
+//    println(edgeMap)
+//    println(hashtagSentimentMap)
 
+    hashtagCounterMap = serializeMap(pathInput + "hashtagCounterMap", hashtagCounterMap)
+    edgeMap = serializeMap(pathInput + "edgeMap", edgeMap.map(t => (t._1._1 + "," + t._1._2, t._2))).map(t => ((t._1.split(",")(0), t._1.split(",")(1)), t._2))
+    hashtagSentimentMap = serializeMapDoubleInt(pathInput + "hashtagSentimentMap", hashtagSentimentMap)
+    if (numRun.equals("TypeRun1"))
       writeFile(pathOutput + "HashtagRun", getTopHashtag)
-    }
     else
       graphComputation(pathOutput)
-
-
-    println(hashtagCounterMap)
-    println(edgeMap)
-    println(hashtagSentimentMap)
   }
 
   /**
@@ -74,7 +67,8 @@ object ScalaTweetAnalysis7 {
 
     tweetEdit.foreachRDD(p => p.foreach(t => for (y <- t._1) {
       hashtagCounterMap += y -> (hashtagCounterMap.getOrElse(y, 0) + 1)
-      hashtagSentimentMap += y -> ((hashtagSentimentMap.getOrElse(y, 2) + t._2) / 2)
+      val temp=hashtagSentimentMap.getOrElse(y, (2,0))
+      hashtagSentimentMap += y -> (temp._1 + t._2, temp._2 + 1 )
       for (i <- t._1) if (y > i) edgeMap += (i, y) -> (edgeMap.getOrElse((i, y), 0) + 1)
     }))
 
@@ -116,20 +110,42 @@ object ScalaTweetAnalysis7 {
     * @param filename
     * @param mapSerialize
     */
-  def serializeMap(filename: String, mapSerialize: Map[String, Int], div:Int): Map[String, Int] = {
+  def serializeMap(filename: String, mapSerialize: Map[String, Int]): Map[String, Int] = {
     var mapToSerialize = mapSerialize
     val fileCountHashtag = readFile(filename).map(t => t.split("="))
     var countHashtag: Int = 0
-    if (!(fileCountHashtag(0).length < 2)) {
-      for (a <- fileCountHashtag) mapToSerialize += a(0) -> ((mapToSerialize.getOrElse(a(0), 0) + a(1).toInt)/div)
+    if (!(fileCountHashtag(0).length < 2))
+      for (a <- fileCountHashtag) mapToSerialize += a(0) -> (mapToSerialize.getOrElse(a(0), 0) + a(1).toInt)
+
+    var text = ""
+    for (hashtag <- mapToSerialize) text += hashtag._1 + "=" + hashtag._2.toString + "\n"
+
+    writeFile(filename, text)
+    mapToSerialize
+  }
+
+
+  def serializeMapDoubleInt(filename: String, mapSerialize: Map[String, (Int,Int)]): Map[String, (Int,Int)] = {
+    var mapToSerialize = mapSerialize
+    val fileCountHashtag = readFile(filename).map(t => t.split("="))
+    var countHashtag: Int = 0
+    if (!(fileCountHashtag(0).length < 2))
+      for (a <- fileCountHashtag){
+        val valueMap= a(1).split(",")
+        val temp=mapToSerialize.getOrElse(a(0), (2,0))
+        mapToSerialize += a(0) -> (temp._1 + valueMap(0).toInt, temp._2 + valueMap(1).toInt)
+
     }
     var text = ""
     for (hashtag <- mapToSerialize) {
-      text += hashtag._1 + "=" + hashtag._2.toString + "\n"
+      text += hashtag._1 + "=" + hashtag._2._1.toString + "," + hashtag._2._2.toString + "\n"
     }
     writeFile(filename, text)
     mapToSerialize
   }
+
+
+
 
   /**
     *
@@ -187,6 +203,7 @@ object ScalaTweetAnalysis7 {
     var textBubbleChart = "var dataset = {\n    \"children\": ["
     var textGraph = "var dataset ={\n  \"nodes\": ["
     for (i <- hashtagCounterMap) {
+      val valueSentiment= hashtagSentimentMap.getOrElse(i._1, (2,1))
       count += 1
       orderKnots += i._1 -> count
       textBubbleChart += "\n        {\n            \"name\": \"" + i._1
@@ -194,7 +211,7 @@ object ScalaTweetAnalysis7 {
       textBubbleChart += "\n        }"
 
       textGraph += "\n    {\n      \"name\": \"" + i._1
-      textGraph += "\",\n      \"group\": " + hashtagSentimentMap.getOrElse(i._1, 2)
+      textGraph += "\",\n      \"group\": " + valueSentiment._1/valueSentiment._2
       textGraph += "\n    }"
 
       if (count != numberHashtag) {

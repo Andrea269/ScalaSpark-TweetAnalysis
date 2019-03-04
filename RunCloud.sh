@@ -1,6 +1,8 @@
 #!/bin/bash
 RUN_SESSION=20181122114000
 
+NUM_RUN=2
+
 GCP_PROJECT=mytweetanalysis2
 GCS_SRC_BUCKET_NAME=bucket-twitter
 
@@ -27,7 +29,9 @@ echo "==========================================================================
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"CLUSTER '${DATAPROC_CLUSTER_NAME}' STARTED!"
 echo "===================================================================================="
 
-#run job 1
+
+#run job Type 1 for N times
+for (( i = 0; i < NUM_RUN; i++ )); do
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
 echo "===================================================================================="
@@ -39,19 +43,9 @@ echo "==========================================================================
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
 
-#run job 2
-echo "===================================================================================="
-echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
-echo "===================================================================================="
-gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
-      --class ${SCALA_RUNNABLE_CLASS} \
-      --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- efTcZmWVuIOC9gncfFBb4Fnav SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa 1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6 gs://bucket-twitter/input/ gs://bucket-twitter/input/ TypeRun1
-echo "===================================================================================="
-echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
-echo "===================================================================================="
+done
 
-#run job 3 END
+#run job Type 2
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
 echo "===================================================================================="

@@ -7,7 +7,7 @@ scalaVersion := "2.11.8"
 mainClass in (Compile, packageBin) := Some("ScalaTweetAnalysis7")
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.9.2" artifacts (Artifact("stanford-corenlp", "models"), Artifact("stanford-corenlp"))
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+//libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 
 
 val sparkVersion = "2.0.2"
@@ -15,17 +15,14 @@ val sparkVersion = "2.0.2"
 libraryDependencies ++= Seq(
   "org.twitter4j" % "twitter4j-core" % "4.0.6",
   "org.twitter4j" % "twitter4j-stream" % "4.0.6",
-  "org.apache.spark" %% "spark-core" % sparkVersion,
+ // "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-streaming" % sparkVersion,
-  "org.apache.bahir" %% "spark-streaming-twitter" % sparkVersion,
-  "org.apache.spark" %% "spark-sql" % sparkVersion,
-  "org.apache.spark" %% "spark-graphx" % sparkVersion
+  "org.apache.bahir" %% "spark-streaming-twitter" % sparkVersion
 )
 
+//javaOptions += "-XX:MaxPermSize=4048m"
 
-// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-//libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.16"//todo
-
+//javaOptions += "-Xmx4048m"
 
 assemblyShadeRules in assembly := Seq(
   ShadeRule.rename("com.google.common.**" -> "repackaged.com.google.common.@1").inAll)

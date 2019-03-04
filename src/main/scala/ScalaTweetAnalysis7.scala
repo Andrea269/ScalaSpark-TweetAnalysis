@@ -15,6 +15,7 @@ object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
   var hashtagSentimentMap: Map[String, (Int,Int)] = scala.collection.immutable.Map[String, (Int,Int)]()
   var edgeMap: Map[(String, String), Int] = scala.collection.immutable.Map[(String, String), Int]()
+  var nodeHigherEdgeValueMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
   val percent: Int = 30
   val thresholdLink: Int = 0
 
@@ -47,8 +48,24 @@ object ScalaTweetAnalysis7 {
     hashtagSentimentMap = serializeMapDoubleInt(pathInput + "hashtagSentimentMap", hashtagSentimentMap)
     if (numRun.equals("TypeRun1"))
       writeFile(pathOutput + "HashtagRun", getTopHashtag)
-    else
+    else {
+      for (a <- hashtagCounterMap) {
+        nodeHigherEdgeValueMap += a._1 -> 0
+      }
+
+      for(b <- edgeMap) {
+        if(b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._1, 0)) {
+          nodeHigherEdgeValueMap += b._1._1 -> b._2
+        }
+        if(b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._2, 0)) {
+          nodeHigherEdgeValueMap += b._1._2 -> b._2
+        }
+
+      }
+
       graphComputation(pathOutput)
+    }
+
   }
 
   /**

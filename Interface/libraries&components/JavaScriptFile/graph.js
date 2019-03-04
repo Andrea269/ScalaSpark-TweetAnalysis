@@ -2,7 +2,7 @@ app = angular.module('graphApp', []);
 
 app.controller('graphController', function ($scope, graphService) {
     $scope.viewResult = null;
-    $scope.maxLink = 2;
+    $scope.minLink = 2;
 
     $scope.load = function () {
         d3.select("#d3matrix").select("svg").remove();
@@ -31,13 +31,21 @@ app.controller('graphController', function ($scope, graphService) {
 
 
         dataset.nodes.forEach(function (node) {
-            if(node.weightMax>=$scope.maxLink) {
+            if(node.weightMax>=$scope.minLink) {
                 nodes.push({name: node.name, group: node.group});
             }
         });
         dataset.links.forEach(function (link) {
-            if(link.weight>=$scope.maxLink) {
-                links.push({source: link.source, target: link.target, weight: link.weight});
+            if(link.weight>=$scope.minLink) {
+                var x=null,
+                    y=null,
+                    i=0;
+                while ((x==null || y==null) && i<nodes.length){
+                    if(link.source===nodes[i].name) x=i;
+                    if(link.target===nodes[i].name) y=i;
+                    i++;
+                }
+                links.push({source: x, target: y, weight: link.weight});
             }
         });
 

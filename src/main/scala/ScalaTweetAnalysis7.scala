@@ -213,7 +213,6 @@ object ScalaTweetAnalysis7 {
     * @param pathOutput
     */
   def graphComputation(pathOutput: String): Unit = {
-    var orderKnots: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
     val numberHashtag = hashtagCounterMap.size
     var count = 0
     var textBubbleChart = "var dataset = {\n    \"children\": ["
@@ -221,14 +220,13 @@ object ScalaTweetAnalysis7 {
     for (i <- hashtagCounterMap) {
       val valueSentiment= hashtagSentimentMap.getOrElse(i._1, (2,1))
       count += 1
-      orderKnots += i._1 -> count
       textBubbleChart += "\n        {\n            \"name\": \"" + i._1
       textBubbleChart += "\",\n            \"count\": " + i._2.toString
       textBubbleChart += "\n        }"
 
       textGraph += "\n    {\n      \"name\": \"" + i._1
       textGraph += "\",\n      \"group\": " + valueSentiment._1/valueSentiment._2
-      textGraph += "\",\n      \"weightMax\": " + nodeHigherEdgeValueMap.getOrElse(i._1, 0)
+      textGraph += ",\n      \"weightMax\": " + nodeHigherEdgeValueMap.getOrElse(i._1, 0)
       textGraph += "\n    }"
 
       if (count != numberHashtag) {
@@ -243,12 +241,10 @@ object ScalaTweetAnalysis7 {
     val numberEdge = edgeMap.size
     count = 0
     for (i <- edgeMap.filter(_._2 > thresholdLink)) {
-      val x1 = orderKnots.getOrElse(i._1._1, 1) - 1
-      val x2 = orderKnots.getOrElse(i._1._2, 1) - 1
       count += 1
-      textGraph += "\n    {\n      \"source\": " + x1
-      textGraph += ",\n      \"target\": " + x2
-      textGraph += ",\n      \"weight\": " + i._2
+      textGraph += "\n    {\n      \"source\": \"" + i._1._1
+      textGraph += "\",\n      \"target\": \"" + i._1._2
+      textGraph += "\",\n      \"weight\": " + i._2
       textGraph += "\n    }"
       if (count != numberEdge) textGraph += ","
     }

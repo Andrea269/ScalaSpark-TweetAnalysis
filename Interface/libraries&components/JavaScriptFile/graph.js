@@ -2,6 +2,7 @@ app = angular.module('graphApp', []);
 
 app.controller('graphController', function ($scope, graphService) {
     $scope.viewResult = null;
+    $scope.maxLink = 2;
 
     $scope.load = function () {
         d3.select("#d3matrix").select("svg").remove();
@@ -25,26 +26,28 @@ app.controller('graphController', function ($scope, graphService) {
             .attr("width", width)
             .attr("height", height);
 
-        var nodes = dataset.nodes.slice(),
-            links = [],
-            bilinks = [];
+        var nodes = [],
+            links = [];
 
+
+        dataset.nodes.forEach(function (node) {
+            if(node.weightMax>=$scope.maxLink) {
+                nodes.push({name: node.name, group: node.group});
+            }
+        });
         dataset.links.forEach(function (link) {
-            var s = nodes[link.source],
-                t = nodes[link.target],
-                i = {}; // intermediate node
-            nodes.push(i);
-            links.push({source: s, target: i}, {source: i, target: t});
-            bilinks.push([s, i, t]);
+            if(link.weight>=$scope.maxLink) {
+                links.push({source: link.source, target: link.target, weight: link.weight});
+            }
         });
 
         force
-            .nodes(dataset.nodes)
-            .links(dataset.links)
+            .nodes(nodes)
+            .links(links)
             .start();
 
         var link = svg.selectAll(".link")
-            .data(dataset.links)
+            .data(links)
             .enter().append("line")
             .attr("class", "link")
             .style("stroke-width", function (d) {
@@ -52,7 +55,7 @@ app.controller('graphController', function ($scope, graphService) {
             });
 
         var node = svg.selectAll(".node")
-            .data(dataset.nodes)
+            .data(nodes)
             .enter().append("g")
             .attr("class", "node")
             .call(force.drag);
@@ -95,6 +98,8 @@ app.controller('graphController', function ($scope, graphService) {
             node.attr("transform", function (d) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
+
+            //console.log("ciao");
 
         });
 

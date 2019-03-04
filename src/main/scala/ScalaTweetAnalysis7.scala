@@ -9,7 +9,6 @@ import twitter4j.Status
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
-//TODO un hashtag deve essere formato solo da lettere e numeri
 
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
@@ -84,7 +83,7 @@ object ScalaTweetAnalysis7 {
 
     tweetEdit.foreachRDD(p => p.foreach(t => for (y <- t._1) {
       hashtagCounterMap += y -> (hashtagCounterMap.getOrElse(y, 0) + 1)
-      val temp=hashtagSentimentMap.getOrElse(y, (2,0))
+      val temp=hashtagSentimentMap.getOrElse(y, (2,1))
       hashtagSentimentMap += y -> (temp._1 + t._2, temp._2 + 1 )
       for (i <- t._1) if (y > i) edgeMap += (i, y) -> (edgeMap.getOrElse((i, y), 0) + 1)
     }))
@@ -229,6 +228,7 @@ object ScalaTweetAnalysis7 {
 
       textGraph += "\n    {\n      \"name\": \"" + i._1
       textGraph += "\",\n      \"group\": " + valueSentiment._1/valueSentiment._2
+      textGraph += "\",\n      \"weightMax\": " + nodeHigherEdgeValueMap.getOrElse(i._1, 0)
       textGraph += "\n    }"
 
       if (count != numberHashtag) {

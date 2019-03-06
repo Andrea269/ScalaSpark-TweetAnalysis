@@ -2,7 +2,20 @@ app = angular.module('graphApp', []);
 
 app.controller('graphController', function ($scope, graphService) {
     $scope.viewResult = null;
-    $scope.minLink = 2;
+    $scope.minLink = 1;
+    $scope.errorInput = null;
+
+
+    $scope.sendInfo = function () {
+        var numLink = document.getElementById("linkThreshold").value;
+        if (numLink>0) {
+            $scope.errorInput = null;
+            $scope.minLink = numLink;
+            $scope.load();
+        }else{
+            $scope.errorInput = "Inserire un numero maggiore di 0";
+        }
+    };
 
     $scope.load = function () {
         d3.select("#d3matrix").select("svg").remove();
@@ -31,18 +44,18 @@ app.controller('graphController', function ($scope, graphService) {
 
 
         dataset.nodes.forEach(function (node) {
-            if(node.weightMax>=$scope.minLink) {
+            if (node.weightMax >= $scope.minLink) {
                 nodes.push({name: node.name, group: node.group});
             }
         });
         dataset.links.forEach(function (link) {
-            if(link.weight>=$scope.minLink) {
-                var x=null,
-                    y=null,
-                    i=0;
-                while ((x==null || y==null) && i<nodes.length){
-                    if(link.source===nodes[i].name) x=i;
-                    if(link.target===nodes[i].name) y=i;
+            if (link.weight >= $scope.minLink) {
+                var x = null,
+                    y = null,
+                    i = 0;
+                while ((x == null || y == null) && i < nodes.length) {
+                    if (link.source === nodes[i].name) x = i;
+                    if (link.target === nodes[i].name) y = i;
                     i++;
                 }
                 links.push({source: x, target: y, weight: link.weight});

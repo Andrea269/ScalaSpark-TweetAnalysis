@@ -79,6 +79,18 @@
             <br>
             Very Negative
             <div class="verynegative"></div>
+            <br>
+            <br>
+            <form>
+                <label>Limite peso Link: </label>
+                <br><p class="error"><b>{{errorInput}}</b></p>
+                <input type="number" value="{{minLink}}" name="linkThreshold" id="linkThreshold" min="1" required>
+                <br><br>
+                <button type="button" id="submitInfoGraph" class="btn btn-success"
+                        ng-click="sendInfo()">
+                    Avvia
+                </button>
+            </form>
         </div>
 
         <br>

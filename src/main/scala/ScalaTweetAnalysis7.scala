@@ -51,7 +51,6 @@ object ScalaTweetAnalysis7 {
       for (a <- hashtagCounterMap) {
         nodeHigherEdgeValueMap += a._1 -> 0
       }
-
       for(b <- edgeMap) {
         if(b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._1, 0)) {
           nodeHigherEdgeValueMap += b._1._1 -> b._2
@@ -59,12 +58,9 @@ object ScalaTweetAnalysis7 {
         if(b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._2, 0)) {
           nodeHigherEdgeValueMap += b._1._2 -> b._2
         }
-
       }
-
       graphComputation(pathOutput)
     }
-
   }
 
   /**

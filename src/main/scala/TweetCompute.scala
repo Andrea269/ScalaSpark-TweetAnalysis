@@ -1,3 +1,12 @@
+/**
+  * Fasano Domenico & Pascali Andrea - University of Bologna
+  * Project for "Scala and Cloud Programming"
+  * Tweet Analysis - Creation of a graph of correlated hashtags given a hashtag
+  *
+  * The object contains a public definition, TweetComputeSample, that, given a a string, extracts the hashtags and the sentiment of that string.
+  * The sentiment is calculated using the StanfordCoreNLP library
+  */
+
 import java.util.Properties
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
@@ -5,14 +14,6 @@ import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
 import scala.collection.convert.wrapAll._
 
-
-/**
-  * Fasano Domenico & Pascali Andrea - University of Bologna
-  * Project for "Scala and Cloud Programming"
-  *
-  *The object contains a public definition, TweetComputeSample, that, given a a string, extracts the hashtags and the sentiment of that string.
-  * The sentiment is calculated using the StanfordCoreNLP library
-  */
 object TweetCompute {
   /**
     * Given a a string, it extracts the hashtags and the sentiment of that string.

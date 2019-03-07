@@ -1,7 +1,6 @@
 # Tweets Analysis using Scala + Spark
 
-##Abstract
-Project dedicated to the analysis of tweets through spark streaming.
+The project is dedicated to the analysis of the hashtags in the tweets through spark streaming. The final output are two json files with the information to compute on a web interface (also included into the project) the graph and the bubble chart.
 
 Tested with JDK 1.8
 

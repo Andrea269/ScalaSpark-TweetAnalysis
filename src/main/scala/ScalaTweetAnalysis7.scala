@@ -1,3 +1,10 @@
+/**
+  * Fasano Domenico & Pascali Andrea - University of Bologna
+  * Project for "Scala and Cloud Programming"
+  * Tweet Analysis - Creation of a graph of correlated hashtags given a hashtag
+  */
+
+
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
 import org.apache.log4j.{Level, Logger}
@@ -8,12 +15,6 @@ import org.apache.spark.{SparkConf, SparkContext}
 import twitter4j.Status
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
-
-/**
-  * Fasano Domenico & Pascali Andrea - University of Bologna
-  * Project for "Scala and Cloud Programming"
-  * Tweet Analysis
-  */
 
 
 object ScalaTweetAnalysis7 {
@@ -29,8 +30,7 @@ object ScalaTweetAnalysis7 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
-    if (args.length < 9) {
-      //controlla che tutti i parametri necessari siano stati forniti in input
+    if (args.length < 9) {//it checks that all the needed parameters are given in input
       System.err.println("Provide input:<ConsumerKey><ConsumerSecret><AccessToken><AccessTokenSecret><PathInput><PathOutput><NumberRun><TimeRun><PercentHashtag>")
       System.exit(1)
     }
@@ -38,18 +38,16 @@ object ScalaTweetAnalysis7 {
     val pathOutput = args(5)
     val numRun = args(6)
     val percent = args(8).toInt
-    val sparkConf = new SparkConf() //configura spark
+
+    val sparkConf = new SparkConf()
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
     val sc = new SparkContext(sparkConf)
-    downloadComputeTweet(sc, args) //esegue il download e la computazione dei tweet
-
-//    println(hashtagCounterMap)
-//    println(edgeMap)
-//    println(hashtagSentimentMap)
+    downloadComputeTweet(sc, args)
 
     hashtagCounterMap = serializeMap(pathInput + "hashtagCounterMap", hashtagCounterMap)
     edgeMap = serializeMap(pathInput + "edgeMap", edgeMap.map(t => (t._1._1 + "," + t._1._2, t._2))).map(t => ((t._1.split(",")(0), t._1.split(",")(1)), t._2))
     hashtagSentimentMap = serializeMapDoubleInt(pathInput + "hashtagSentimentMap", hashtagSentimentMap)
+
     if (numRun.equals("TypeRun1"))
       writeFile(pathOutput + "HashtagRun", getTopHashtag(percent))
     else {
@@ -72,13 +70,8 @@ object ScalaTweetAnalysis7 {
     }
   }
 
-  /**
-    *
-    * @param sc        SparkContext
-    * @param args      consumerKey, consumerKeySecret, accessToken, accessTokenSecret
-    */
   def downloadComputeTweet(sc: SparkContext, args: Array[String]): Unit = {
-    val ssc = new StreamingContext(sc, Seconds(1)) //crea il contesto di streaming con un intervallo di X secondi
+    val ssc = new StreamingContext(sc, Seconds(1)) //create the streaming context with mini-batch of 1 seconds
     val timeRun = args(7).toLong
     val tweetsDownload = downloadTweet(ssc, args, args(4) + "HashtagRun").filter(_.getLang() == "en")
     val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
@@ -106,7 +99,7 @@ object ScalaTweetAnalysis7 {
     * @param pathFilter
     * @return
     */
-  def downloadTweet(ssc: StreamingContext, args: Array[String], pathFilter: String): ReceiverInputDStream[Status] = {
+  private def downloadTweet(ssc: StreamingContext, args: Array[String], pathFilter: String): ReceiverInputDStream[Status] = {
     //leggo dai parametri passati dall'utente le 4 chiavi twitter
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
     var filters = readFile(pathFilter).map(t => " " + t + " ")
@@ -131,7 +124,7 @@ object ScalaTweetAnalysis7 {
     * @param filename
     * @param mapSerialize
     */
-  def serializeMap(filename: String, mapSerialize: Map[String, Int]): Map[String, Int] = {
+  private def serializeMap(filename: String, mapSerialize: Map[String, Int]): Map[String, Int] = {
     var mapToSerialize = mapSerialize
     val fileCountHashtag = readFile(filename).map(t => t.split("="))
     var countHashtag: Int = 0
@@ -146,7 +139,7 @@ object ScalaTweetAnalysis7 {
   }
 
 
-  def serializeMapDoubleInt(filename: String, mapSerialize: Map[String, (Int,Int)]): Map[String, (Int,Int)] = {
+  private def serializeMapDoubleInt(filename: String, mapSerialize: Map[String, (Int,Int)]): Map[String, (Int,Int)] = {
     var mapToSerialize = mapSerialize
     val fileCountHashtag = readFile(filename).map(t => t.split("="))
     var countHashtag: Int = 0
@@ -165,19 +158,16 @@ object ScalaTweetAnalysis7 {
     mapToSerialize
   }
 
-  def cleanFile(filename: String): Unit = {
+  private def cleanFile(filename: String): Unit = {
     writeFile(filename, "")
   }
-
-
-
 
   /**
     *
     * @param filename
     * @return
     */
-  def readFile(filename: String): Array[String] = {
+  private def readFile(filename: String): Array[String] = {
     val hadoopPath = new Path(filename)
     val inputStream: FSDataInputStream = hadoopPath.getFileSystem(new Configuration()).open(hadoopPath)
     val wrappedStream = inputStream.getWrappedStream
@@ -196,7 +186,7 @@ object ScalaTweetAnalysis7 {
     * @param filename
     * @param text
     */
-  def writeFile(filename: String, text: String): Unit = {
+  private def writeFile(filename: String, text: String): Unit = {
     val hadoopPath = new Path(filename)
     val outputPath: FSDataOutputStream = hadoopPath.getFileSystem(new Configuration()).create(hadoopPath)
     val wrappedStream = outputPath.getWrappedStream
@@ -210,7 +200,7 @@ object ScalaTweetAnalysis7 {
     *
     * @return
     */
-  def getTopHashtag(percent: Int): String = {
+ private def getTopHashtag(percent: Int): String = {
     val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
     var topHashtag = ""
     for (i <- 0 to orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
@@ -221,7 +211,7 @@ object ScalaTweetAnalysis7 {
     *
     * @param pathOutput
     */
-  def graphComputation(pathOutput: String): Unit = {
+  private def graphComputation(pathOutput: String): Unit = {
     val numberHashtag = hashtagCounterMap.size
     var count = 0
     var textBubbleChart = "var dataset = {\n    \"children\": ["

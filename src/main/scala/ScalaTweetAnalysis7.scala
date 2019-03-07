@@ -9,6 +9,12 @@ import twitter4j.Status
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 
+/**
+  * Fasano Domenico & Pascali Andrea - University of Bologna
+  * Project for "Scala and Cloud Programming"
+  * Tweet Analysis
+  */
+
 
 object ScalaTweetAnalysis7 {
   var hashtagCounterMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()

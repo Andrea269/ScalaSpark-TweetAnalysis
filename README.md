@@ -1,4 +1,4 @@
-# ScalaSpark-TweetAnalysis
+# Tweets Analysis using Scala + Spark
 
 ##Abstract
 Project dedicated to the analysis of tweets through spark streaming.

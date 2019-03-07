@@ -60,6 +60,10 @@ object ScalaTweetAnalysis7 {
         }
       }
       graphComputation(pathOutput)
+
+      cleanFile(pathInput + "hashtagCounterMap")
+      cleanFile(pathInput + "edgeMap")
+      cleanFile(pathInput + "hashtagSentimentMap")
     }
   }
 
@@ -147,13 +151,17 @@ object ScalaTweetAnalysis7 {
         val temp=mapToSerialize.getOrElse(a(0), (2,0))
         mapToSerialize += a(0) -> (temp._1 + valueMap(0).toInt, temp._2 + valueMap(1).toInt)
 
-    }
+      }
     var text = ""
     for (hashtag <- mapToSerialize) {
       text += hashtag._1 + "=" + hashtag._2._1.toString + "," + hashtag._2._2.toString + "\n"
     }
     writeFile(filename, text)
     mapToSerialize
+  }
+
+  def cleanFile(filename: String): Unit = {
+    writeFile(filename, "")
   }
 
 

@@ -1,278 +1,453 @@
 var dataset ={
   "nodes": [
     {
-      "name": "#testscores",
+      "name": "#WWG1WGA",
       "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#testscores",
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#Bingo",
-      "group": 3,
+      "group": 7,
       "weightMax": 1
     },
     {
       "name": "#nyt",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#aarp",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#TheResistance",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#wsj",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#Cali",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#pbs",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
+      "name": "#FOXNEWS",
+      "group": 1,
+      "weightMax": 0
+    },
+    {
       "name": "#Bullshit",
-      "group": 3,
+      "group": 7,
       "weightMax": 1
     },
     {
       "name": "#RiseTogether",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Infowars",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#foxnews",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Qanon",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#NorthKorea",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#Brexit",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#huffpost",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Manafort's",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#ThursdayThoughts",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#MSNBC",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#bbc",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#KAG",
-      "group": 3,
-      "weightMax": 1
+      "group": 4,
+      "weightMax": 2
     },
     {
       "name": "#trump",
-      "group": 1,
+      "group": 2,
       "weightMax": 1
     },
     {
       "name": "#D",
-      "group": 4,
+      "group": 7,
+      "weightMax": 1
+    },
+    {
+      "name": "#Russia",
+      "group": 1,
       "weightMax": 1
     },
     {
       "name": "#California",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#politico",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#Cohen",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#UKIP",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#cbs",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#CaPatriotsUnited",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#MichaelCohen",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#America",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#education",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#PaulManafort",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#Jerusalem",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#MorningJoe",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#aoc",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#wapo",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Trump's",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#Government",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#VoterFraud",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#CNN",
+      "group": 3,
+      "weightMax": 2
+    },
+    {
+      "name": "#TrumpRussia",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Bolton",
       "group": 1,
       "weightMax": 1
     },
     {
-      "name": "#TrumpRussia",
+      "name": "#UniversityChallenge",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#pelosi",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Israel",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#npr",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Ukraine",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#thehill",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#Republican",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#MondayMotivation",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#FoxandFriends",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#FBI",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#fox",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Republicans",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#usa",
-      "group": 2,
+      "group": 6,
+      "weightMax": 1
+    },
+    {
+      "name": "#MarsLanding",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#Kenya",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#Independents",
+      "group": 1,
       "weightMax": 1
     },
     {
       "name": "#drudge",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#TommyRobinson",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#nytimes",
-      "group": 1,
+      "group": 5,
       "weightMax": 1
     },
     {
       "name": "#DemocratsHateAmerica",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#nbc",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#onanewsagency",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#Democrats",
-      "group": 1,
+      "group": 2,
       "weightMax": 1
     },
     {
       "name": "#Rosenmontag2019",
-      "group": 4,
+      "group": 7,
+      "weightMax": 1
+    },
+    {
+      "name": "#retirement",
+      "group": 1,
       "weightMax": 1
     },
     {
       "name": "#Mueller",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#Tcot",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#MAGA",
-      "group": 2,
-      "weightMax": 1
+      "group": 3,
+      "weightMax": 4
     },
     {
       "name": "#democracy",
-      "group": 2,
+      "group": 3,
       "weightMax": 2
     },
     {
+      "name": "#ccot",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
+      "name": "#Cohen's",
+      "group": 1,
+      "weightMax": 1
+    },
+    {
       "name": "#us",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#Trump",
       "group": 1,
-      "weightMax": 2
+      "weightMax": 4
     },
     {
       "name": "#gop",
-      "group": 1,
+      "group": 3,
       "weightMax": 1
     },
     {
       "name": "#Election2020",
-      "group": 2,
+      "group": 6,
+      "weightMax": 1
+    },
+    {
+      "name": "#Netanyahu",
+      "group": 1,
       "weightMax": 1
     },
     {
       "name": "#Resist",
-      "group": 2,
+      "group": 6,
+      "weightMax": 1
+    },
+    {
+      "name": "#Onaaz",
+      "group": 1,
       "weightMax": 1
     },
     {
       "name": "#immigrants",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#SundayMorning",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#SundayMotivation",
-      "group": 2,
+      "group": 6,
       "weightMax": 1
     },
     {
       "name": "#cnbc",
+      "group": 5,
+      "weightMax": 1
+    },
+    {
+      "name": "#MSM",
       "group": 1,
       "weightMax": 1
     },
     {
       "name": "#CohenTestimony",
-      "group": 3,
+      "group": 7,
       "weightMax": 1
     }
   ],
@@ -290,6 +465,11 @@ var dataset ={
     {
       "source": "#Democrats",
       "target": "#trump",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#Israel",
       "weight": 1
     },
     {
@@ -318,8 +498,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#CNN",
+      "target": "#MAGA",
+      "weight": 1
+    },
+    {
       "source": "#fox",
       "target": "#npr",
+      "weight": 1
+    },
+    {
+      "source": "#WWG1WGA",
+      "target": "#ccot",
       "weight": 1
     },
     {
@@ -330,6 +520,11 @@ var dataset ={
     {
       "source": "#MondayMotivation",
       "target": "#VoterFraud",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#MorningJoe",
       "weight": 1
     },
     {
@@ -373,6 +568,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Democrats",
+      "target": "#MSM",
+      "weight": 1
+    },
+    {
       "source": "#bbc",
       "target": "#cbs",
       "weight": 1
@@ -380,6 +580,16 @@ var dataset ={
     {
       "source": "#Republican",
       "target": "#usa",
+      "weight": 1
+    },
+    {
+      "source": "#Democrats",
+      "target": "#Kenya",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#Tcot",
       "weight": 1
     },
     {
@@ -409,12 +619,32 @@ var dataset ={
     },
     {
       "source": "#CNN",
+      "target": "#KAG",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
       "target": "#aarp",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#Trump",
       "weight": 1
     },
     {
       "source": "#aarp",
       "target": "#bbc",
+      "weight": 1
+    },
+    {
+      "source": "#Russia",
+      "target": "#Trump's",
+      "weight": 1
+    },
+    {
+      "source": "#TommyRobinson",
+      "target": "#UniversityChallenge",
       "weight": 1
     },
     {
@@ -438,6 +668,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Qanon",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
       "source": "#California",
       "target": "#Trump",
       "weight": 1
@@ -448,13 +683,43 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Cohen's",
+      "target": "#Manafort's",
+      "weight": 1
+    },
+    {
       "source": "#cnbc",
       "target": "#nbc",
       "weight": 1
     },
     {
+      "source": "#MichaelCohen",
+      "target": "#Russia",
+      "weight": 1
+    },
+    {
+      "source": "#Brexit",
+      "target": "#Jerusalem",
+      "weight": 1
+    },
+    {
+      "source": "#UKIP",
+      "target": "#UniversityChallenge",
+      "weight": 1
+    },
+    {
+      "source": "#Cohen's",
+      "target": "#Trump's",
+      "weight": 1
+    },
+    {
       "source": "#Cali",
       "target": "#RiseTogether",
+      "weight": 1
+    },
+    {
+      "source": "#Government",
+      "target": "#MSM",
       "weight": 1
     },
     {
@@ -478,6 +743,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
       "source": "#bbc",
       "target": "#politico",
       "weight": 1
@@ -495,6 +765,21 @@ var dataset ={
     {
       "source": "#bbc",
       "target": "#nytimes",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
+      "source": "#MichaelCohen",
+      "target": "#PaulManafort",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#ThursdayThoughts",
       "weight": 1
     },
     {
@@ -528,8 +813,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#NorthKorea",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
       "source": "#drudge",
       "target": "#foxnews",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#Tcot",
       "weight": 1
     },
     {
@@ -543,8 +838,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#ThursdayThoughts",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
       "source": "#drudge",
       "target": "#wsj",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#MarsLanding",
       "weight": 1
     },
     {
@@ -558,13 +863,33 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#NorthKorea",
+      "target": "#Onaaz",
+      "weight": 1
+    },
+    {
+      "source": "#Israel",
+      "target": "#Netanyahu",
+      "weight": 1
+    },
+    {
       "source": "#MAGA",
       "target": "#SundayMotivation",
       "weight": 1
     },
     {
+      "source": "#Brexit",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
       "source": "#MSNBC",
       "target": "#huffpost",
+      "weight": 1
+    },
+    {
+      "source": "#MorningJoe",
+      "target": "#WWG1WGA",
       "weight": 1
     },
     {
@@ -638,6 +963,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MarsLanding",
+      "target": "#UniversityChallenge",
+      "weight": 1
+    },
+    {
       "source": "#CaPatriotsUnited",
       "target": "#Trump",
       "weight": 1
@@ -648,8 +978,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Democrats",
+      "target": "#Government",
+      "weight": 1
+    },
+    {
       "source": "#MSNBC",
       "target": "#wsj",
+      "weight": 1
+    },
+    {
+      "source": "#Trump",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#MorningJoe",
+      "target": "#Tcot",
       "weight": 1
     },
     {
@@ -693,6 +1038,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Trump",
+      "target": "#UniversityChallenge",
+      "weight": 1
+    },
+    {
       "source": "#npr",
       "target": "#nytimes",
       "weight": 1
@@ -710,6 +1060,11 @@ var dataset ={
     {
       "source": "#huffpost",
       "target": "#thehill",
+      "weight": 1
+    },
+    {
+      "source": "#Kenya",
+      "target": "#MSM",
       "weight": 1
     },
     {
@@ -768,6 +1123,16 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#CNN",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#Brexit",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
       "source": "#nbc",
       "target": "#pelosi",
       "weight": 1
@@ -775,6 +1140,11 @@ var dataset ={
     {
       "source": "#aarp",
       "target": "#pbs",
+      "weight": 1
+    },
+    {
+      "source": "#Brexit",
+      "target": "#Infowars",
       "weight": 1
     },
     {
@@ -803,6 +1173,16 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#ThursdayThoughts",
+      "weight": 1
+    },
+    {
+      "source": "#America",
+      "target": "#Bolton",
+      "weight": 1
+    },
+    {
       "source": "#CNN",
       "target": "#wsj",
       "weight": 1
@@ -815,6 +1195,11 @@ var dataset ={
     {
       "source": "#aarp",
       "target": "#nbc",
+      "weight": 1
+    },
+    {
+      "source": "#MarsLanding",
+      "target": "#Netanyahu",
       "weight": 1
     },
     {
@@ -835,6 +1220,26 @@ var dataset ={
     {
       "source": "#cnbc",
       "target": "#npr",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#ThursdayThoughts",
+      "weight": 1
+    },
+    {
+      "source": "#Israel",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#MOG",
+      "weight": 1
+    },
+    {
+      "source": "#America",
+      "target": "#NorthKorea",
       "weight": 1
     },
     {
@@ -860,6 +1265,11 @@ var dataset ={
     {
       "source": "#CNN",
       "target": "#Trump",
+      "weight": 2
+    },
+    {
+      "source": "#Brexit",
+      "target": "#MAGA",
       "weight": 1
     },
     {
@@ -873,8 +1283,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MorningJoe",
+      "target": "#Qanon",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#MAGA",
+      "weight": 1
+    },
+    {
       "source": "#aarp",
       "target": "#politico",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#MorningJoe",
       "weight": 1
     },
     {
@@ -893,6 +1318,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Bolton",
+      "target": "#NorthKorea",
+      "weight": 1
+    },
+    {
       "source": "#Trump",
       "target": "#nytimes",
       "weight": 1
@@ -905,6 +1335,16 @@ var dataset ={
     {
       "source": "#nbc",
       "target": "#wsj",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#Qanon",
+      "weight": 1
+    },
+    {
+      "source": "#Jerusalem",
+      "target": "#UKIP",
       "weight": 1
     },
     {
@@ -943,8 +1383,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Bolton",
+      "target": "#Onaaz",
+      "weight": 1
+    },
+    {
       "source": "#SundayMorning",
       "target": "#SundayMotivation",
+      "weight": 1
+    },
+    {
+      "source": "#MarsLanding",
+      "target": "#Trump",
       "weight": 1
     },
     {
@@ -1018,8 +1468,33 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#ThursdayThoughts",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#MorningJoe",
+      "weight": 1
+    },
+    {
+      "source": "#MarsLanding",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
       "source": "#nyt",
       "target": "#wsj",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#MAGA",
       "weight": 1
     },
     {
@@ -1028,13 +1503,43 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Independents",
+      "target": "#retirement",
+      "weight": 1
+    },
+    {
       "source": "#nbc",
       "target": "#pbs",
       "weight": 1
     },
     {
+      "source": "#ThursdayThoughts",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
       "source": "#fox",
       "target": "#huffpost",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
+      "source": "#MorningJoe",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
+      "source": "#America",
+      "target": "#onanewsagency",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#Trump",
       "weight": 1
     },
     {
@@ -1068,9 +1573,14 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Cohen's",
+      "target": "#Russia",
+      "weight": 1
+    },
+    {
       "source": "#KAG",
       "target": "#Trump",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "#MondayMotivation",
@@ -1080,6 +1590,16 @@ var dataset ={
     {
       "source": "#fox",
       "target": "#nytimes",
+      "weight": 1
+    },
+    {
+      "source": "#Bolton",
+      "target": "#onanewsagency",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#ThursdayThoughts",
       "weight": 1
     },
     {
@@ -1095,6 +1615,11 @@ var dataset ={
     {
       "source": "#drudge",
       "target": "#nyt",
+      "weight": 1
+    },
+    {
+      "source": "#Trump",
+      "target": "#ccot",
       "weight": 1
     },
     {
@@ -1148,6 +1673,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#America",
+      "target": "#Onaaz",
+      "weight": 1
+    },
+    {
       "source": "#nyt",
       "target": "#pelosi",
       "weight": 1
@@ -1155,6 +1685,11 @@ var dataset ={
     {
       "source": "#pelosi",
       "target": "#wapo",
+      "weight": 1
+    },
+    {
+      "source": "#Cohen's",
+      "target": "#MichaelCohen",
       "weight": 1
     },
     {
@@ -1198,8 +1733,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Cohen's",
+      "target": "#Ukraine",
+      "weight": 1
+    },
+    {
       "source": "#nyt",
       "target": "#nytimes",
+      "weight": 1
+    },
+    {
+      "source": "#Qanon",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
+      "source": "#Jerusalem",
+      "target": "#Trump",
       "weight": 1
     },
     {
@@ -1223,6 +1773,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Israel",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
       "source": "#Election2020",
       "target": "#usa",
       "weight": 1
@@ -1243,6 +1798,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#UniversityChallenge",
+      "weight": 1
+    },
+    {
       "source": "#Democrats",
       "target": "#npr",
       "weight": 1
@@ -1258,13 +1818,33 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Trump",
+      "target": "#onanewsagency",
+      "weight": 1
+    },
+    {
       "source": "#bbc",
       "target": "#nbc",
       "weight": 1
     },
     {
+      "source": "#Qanon",
+      "target": "#ThursdayThoughts",
+      "weight": 1
+    },
+    {
+      "source": "#Manafort's",
+      "target": "#MichaelCohen",
+      "weight": 1
+    },
+    {
       "source": "#MSNBC",
       "target": "#fox",
+      "weight": 1
+    },
+    {
+      "source": "#Onaaz",
+      "target": "#Trump",
       "weight": 1
     },
     {
@@ -1283,6 +1863,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#FoxandFriends",
+      "target": "#KAG",
+      "weight": 1
+    },
+    {
       "source": "#RiseTogether",
       "target": "#Trump",
       "weight": 1
@@ -1298,8 +1883,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Brexit",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
       "source": "#Republican",
       "target": "#trump",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#ccot",
       "weight": 1
     },
     {
@@ -1328,6 +1923,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MorningJoe",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
       "source": "#fox",
       "target": "#thehill",
       "weight": 1
@@ -1335,6 +1935,11 @@ var dataset ={
     {
       "source": "#Trump",
       "target": "#wsj",
+      "weight": 1
+    },
+    {
+      "source": "#Israel",
+      "target": "#UniversityChallenge",
       "weight": 1
     },
     {
@@ -1368,6 +1973,21 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#CNN",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#Jerusalem",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
+      "source": "#Tcot",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
       "source": "#aoc",
       "target": "#pbs",
       "weight": 1
@@ -1388,6 +2008,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Israel",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
       "source": "#gop",
       "target": "#pelosi",
       "weight": 1
@@ -1398,8 +2023,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Brexit",
+      "target": "#Israel",
+      "weight": 1
+    },
+    {
       "source": "#gop",
       "target": "#npr",
+      "weight": 1
+    },
+    {
+      "source": "#Republicans",
+      "target": "#retirement",
+      "weight": 1
+    },
+    {
+      "source": "#Brexit",
+      "target": "#UniversityChallenge",
       "weight": 1
     },
     {
@@ -1423,8 +2063,28 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#PaulManafort",
+      "target": "#Trump's",
+      "weight": 1
+    },
+    {
+      "source": "#MarsLanding",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
       "source": "#Democrats",
       "target": "#us",
+      "weight": 1
+    },
+    {
+      "source": "#Netanyahu",
+      "target": "#TommyRobinson",
+      "weight": 1
+    },
+    {
+      "source": "#Tcot",
+      "target": "#ThursdayThoughts",
       "weight": 1
     },
     {
@@ -1458,8 +2118,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#CNN",
+      "target": "#Qanon",
+      "weight": 1
+    },
+    {
       "source": "#npr",
       "target": "#wapo",
+      "weight": 1
+    },
+    {
+      "source": "#MorningJoe",
+      "target": "#ThursdayThoughts",
       "weight": 1
     },
     {
@@ -1478,6 +2148,21 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#Netanyahu",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
+      "source": "#Manafort's",
+      "target": "#Russia",
+      "weight": 1
+    },
+    {
       "source": "#Trump",
       "target": "#gop",
       "weight": 1
@@ -1490,6 +2175,11 @@ var dataset ={
     {
       "source": "#Democrats",
       "target": "#pelosi",
+      "weight": 1
+    },
+    {
+      "source": "#Jerusalem",
+      "target": "#UniversityChallenge",
       "weight": 1
     },
     {
@@ -1520,7 +2210,7 @@ var dataset ={
     {
       "source": "#MAGA",
       "target": "#Trump",
-      "weight": 1
+      "weight": 4
     },
     {
       "source": "#aoc",
@@ -1553,6 +2243,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Manafort's",
+      "target": "#PaulManafort",
+      "weight": 1
+    },
+    {
       "source": "#foxnews",
       "target": "#gop",
       "weight": 1
@@ -1560,6 +2255,11 @@ var dataset ={
     {
       "source": "#California",
       "target": "#MondayMotivation",
+      "weight": 1
+    },
+    {
+      "source": "#Netanyahu",
+      "target": "#Trump",
       "weight": 1
     },
     {
@@ -1575,6 +2275,11 @@ var dataset ={
     {
       "source": "#huffpost",
       "target": "#wapo",
+      "weight": 1
+    },
+    {
+      "source": "#Israel",
+      "target": "#Jerusalem",
       "weight": 1
     },
     {
@@ -1598,6 +2303,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#MarsLanding",
+      "weight": 1
+    },
+    {
       "source": "#cnbc",
       "target": "#pbs",
       "weight": 1
@@ -1608,8 +2318,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Israel",
+      "target": "#MAGA",
+      "weight": 1
+    },
+    {
       "source": "#Election2020",
       "target": "#us",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#MorningJoe",
       "weight": 1
     },
     {
@@ -1638,6 +2358,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#America",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
       "source": "#Democrats",
       "target": "#DemocratsHateAmerica",
       "weight": 1
@@ -1663,8 +2388,28 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Jerusalem",
+      "target": "#MAGA",
+      "weight": 1
+    },
+    {
       "source": "#aarp",
       "target": "#aoc",
+      "weight": 1
+    },
+    {
+      "source": "#Infowars",
+      "target": "#Jerusalem",
+      "weight": 1
+    },
+    {
+      "source": "#PaulManafort",
+      "target": "#Russia",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#Qanon",
       "weight": 1
     },
     {
@@ -1703,8 +2448,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Infowars",
+      "target": "#Netanyahu",
+      "weight": 1
+    },
+    {
       "source": "#foxnews",
       "target": "#wsj",
+      "weight": 1
+    },
+    {
+      "source": "#Netanyahu",
+      "target": "#UniversityChallenge",
       "weight": 1
     },
     {
@@ -1723,6 +2478,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Tcot",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
       "source": "#thehill",
       "target": "#wapo",
       "weight": 1
@@ -1730,6 +2490,11 @@ var dataset ={
     {
       "source": "#Bullshit",
       "target": "#KAG",
+      "weight": 1
+    },
+    {
+      "source": "#Brexit",
+      "target": "#Netanyahu",
       "weight": 1
     },
     {
@@ -1763,6 +2528,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Government",
+      "target": "#Kenya",
+      "weight": 1
+    },
+    {
       "source": "#Trump",
       "target": "#wapo",
       "weight": 1
@@ -1788,8 +2558,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Onaaz",
+      "target": "#onanewsagency",
+      "weight": 1
+    },
+    {
       "source": "#aarp",
       "target": "#foxnews",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#FoxandFriends",
       "weight": 1
     },
     {
@@ -1808,8 +2593,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#FoxandFriends",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
       "source": "#CNN",
       "target": "#nyt",
+      "weight": 1
+    },
+    {
+      "source": "#Independents",
+      "target": "#Republicans",
       "weight": 1
     },
     {
@@ -1833,6 +2633,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
       "source": "#Trump",
       "target": "#npr",
       "weight": 1
@@ -1840,6 +2645,21 @@ var dataset ={
     {
       "source": "#Democrats",
       "target": "#bbc",
+      "weight": 1
+    },
+    {
+      "source": "#Bolton",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
+      "source": "#Manafort's",
+      "target": "#Trump's",
+      "weight": 1
+    },
+    {
+      "source": "#Cohen's",
+      "target": "#PaulManafort",
       "weight": 1
     },
     {
@@ -1855,6 +2675,16 @@ var dataset ={
     {
       "source": "#gop",
       "target": "#politico",
+      "weight": 1
+    },
+    {
+      "source": "#NorthKorea",
+      "target": "#onanewsagency",
+      "weight": 1
+    },
+    {
+      "source": "#Trump's",
+      "target": "#Ukraine",
       "weight": 1
     },
     {
@@ -1883,6 +2713,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#KAG",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
       "source": "#bbc",
       "target": "#drudge",
       "weight": 1
@@ -1890,6 +2725,11 @@ var dataset ={
     {
       "source": "#CNN",
       "target": "#drudge",
+      "weight": 1
+    },
+    {
+      "source": "#MichaelCohen",
+      "target": "#Ukraine",
       "weight": 1
     },
     {
@@ -1903,6 +2743,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MAGA",
+      "target": "#Netanyahu",
+      "weight": 1
+    },
+    {
       "source": "#gop",
       "target": "#immigrants",
       "weight": 1
@@ -1913,8 +2758,23 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#FoxandFriends",
+      "target": "#MAGA",
+      "weight": 1
+    },
+    {
+      "source": "#Qanon",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
       "source": "#foxnews",
       "target": "#huffpost",
+      "weight": 1
+    },
+    {
+      "source": "#Tcot",
+      "target": "#WWG1WGA",
       "weight": 1
     },
     {
@@ -1923,13 +2783,33 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Qanon",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
       "source": "#CNN",
       "target": "#pbs",
       "weight": 1
     },
     {
+      "source": "#Russia",
+      "target": "#Ukraine",
+      "weight": 1
+    },
+    {
       "source": "#gop",
       "target": "#thehill",
+      "weight": 1
+    },
+    {
+      "source": "#PaulManafort",
+      "target": "#Ukraine",
+      "weight": 1
+    },
+    {
+      "source": "#TommyRobinson",
+      "target": "#UKIP",
       "weight": 1
     },
     {
@@ -1940,6 +2820,16 @@ var dataset ={
     {
       "source": "#CNN",
       "target": "#huffpost",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#Manafort's",
+      "target": "#Ukraine",
       "weight": 1
     },
     {
@@ -1973,6 +2863,11 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Infowars",
+      "target": "#UniversityChallenge",
+      "weight": 1
+    },
+    {
       "source": "#MSNBC",
       "target": "#foxnews",
       "weight": 1
@@ -1993,8 +2888,18 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Jerusalem",
+      "target": "#Netanyahu",
+      "weight": 1
+    },
+    {
       "source": "#DemocratsHateAmerica",
       "target": "#Election2020",
+      "weight": 1
+    },
+    {
+      "source": "#Brexit",
+      "target": "#MarsLanding",
       "weight": 1
     },
     {
@@ -2013,6 +2918,16 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#MichaelCohen",
+      "target": "#Trump's",
+      "weight": 1
+    },
+    {
+      "source": "#Israel",
+      "target": "#MarsLanding",
+      "weight": 1
+    },
+    {
       "source": "#drudge",
       "target": "#pelosi",
       "weight": 1
@@ -2028,13 +2943,43 @@ var dataset ={
       "weight": 1
     },
     {
+      "source": "#Trump",
+      "target": "#UKIP",
+      "weight": 1
+    },
+    {
       "source": "#Cali",
       "target": "#California",
       "weight": 1
     },
     {
+      "source": "#FoxandFriends",
+      "target": "#Qanon",
+      "weight": 1
+    },
+    {
       "source": "#Trump",
       "target": "#huffpost",
+      "weight": 1
+    },
+    {
+      "source": "#TommyRobinson",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
+      "source": "#MOG",
+      "target": "#Trump",
+      "weight": 1
+    },
+    {
+      "source": "#Jerusalem",
+      "target": "#MarsLanding",
+      "weight": 1
+    },
+    {
+      "source": "#ImpeachTrump",
+      "target": "#Trump",
       "weight": 1
     },
     {

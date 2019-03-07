@@ -59,11 +59,6 @@ app.controller('bubbleChartController', function ($scope, bubbleChartService) {
                     return "translate(" + d.x + "," + d.y + ")";
                 });
 
-            node.append("title")
-                .text(function (d) {
-                    return d.name + ": " + d.count;
-                });
-
             node.append("circle")
                 .attr("r", function (d) {
                     return d.r;
@@ -83,6 +78,11 @@ app.controller('bubbleChartController', function ($scope, bubbleChartService) {
                     return d.r / 5;
                 })
                 .attr("fill", "white");
+
+            node.append("title")
+                .text(function (d) {
+                    return d.data.name + ": " + d.data.count;
+                });
 
             node.append("text")
                 .attr("dy", "1.3em")

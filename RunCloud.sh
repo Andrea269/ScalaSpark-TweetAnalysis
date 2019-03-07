@@ -30,8 +30,9 @@ echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"CLUSTER '${DATAPROC_CLUSTER_NAME}' STA
 echo "===================================================================================="
 
 
-#run job Type 1 for N times
-for (( i = 0; i < NUM_RUN; i++ )); do
+#run job Type 1 for N time$
+for i in $(seq 1 $NUM_RUN); do
+
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
 echo "===================================================================================="

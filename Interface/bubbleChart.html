@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="libraries&components/StyleCss/custom.css"/>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+            crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 
     <script src="GraphData/datiBubbleChart.js"></script>
@@ -54,18 +56,37 @@
     <br><br>
 
     <div>
-        <br><h1 align="center">Analisi realtime dei tweet</h1><br>
+        <br>
+        <div id="resultScroll"></div>
+        <!--<div id="resultScroll"></div>-->
+        <div class="row">
+            <div class="col-sm-9 text-left">
+                <div id="d3matrix" align="center"></div>
+            </div>
+            <div class="col-sm-3">
+                <br><br>
+                <form>
+                    <label>Limite peso Link: </label>
+                    <br>
+                    <p class="error"><b>{{errorInput}}</b></p>
+                    <input type="number" value="{{minLink}}" name="linkThreshold" id="linkThreshold" min="1" required>
+                    <br><br>
+                    <button type="button" id="submitInfoGraph" class="btn btn-success"
+                            ng-click="sendInfo()">
+                        Load
+                    </button>
+                </form>
+            </div>
 
-        <div id="d3matrix" align="center"></div>
+        </div>
+
+        <br><br><br><br>
+        <footer class="container-fluid text-center navbar-fixed-bottom">
+
+            Progetto realizzato da:<br>
+
+            <b>Andrea Pascali </b> & <b>Domenico Fasano</b><br>
+        </footer>
     </div>
-
-    <br><br><br><br>
-    <footer class="container-fluid text-center navbar-fixed-bottom">
-
-        Progetto realizzato da:<br>
-
-        <b>Andrea Pascali </b> & <b>Domenico Fasano</b><br>
-    </footer>
-</div>
 </body>
 </html>

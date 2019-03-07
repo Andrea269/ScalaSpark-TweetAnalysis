@@ -16,7 +16,6 @@ object ScalaTweetAnalysis7 {
   var edgeMap: Map[(String, String), Int] = scala.collection.immutable.Map[(String, String), Int]()
   var nodeHigherEdgeValueMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
   val percent: Int = 30
-  val thresholdLink: Int = 0
 
   /**
     *
@@ -244,7 +243,7 @@ object ScalaTweetAnalysis7 {
     textGraph += "\n  ],\n  \"links\": ["
     val numberEdge = edgeMap.size
     count = 0
-    for (i <- edgeMap.filter(_._2 > thresholdLink)) {
+    for (i <- edgeMap) {
       count += 1
       textGraph += "\n    {\n      \"source\": \"" + i._1._1
       textGraph += "\",\n      \"target\": \"" + i._1._2

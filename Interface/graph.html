@@ -55,7 +55,6 @@
     <br><br>
 
     <br>
-    <h1 align="center">Analisi realtime dei tweet</h1>
 
     <div id="resultScroll"></div>
     <!--<div id="resultScroll"></div>-->
@@ -82,13 +81,13 @@
             <br>
             <br>
             <form>
-                <label>Limite peso Link: </label>
+                <label>Edges threshold: </label>
                 <br><p class="error"><b>{{errorInput}}</b></p>
                 <input type="number" value="{{minLink}}" name="linkThreshold" id="linkThreshold" min="1" required>
                 <br><br>
                 <button type="button" id="submitInfoGraph" class="btn btn-success"
                         ng-click="sendInfo()">
-                    Avvia
+                    Load
                 </button>
             </form>
         </div>
@@ -98,7 +97,7 @@
         <br>
         <footer class="container-fluid text-center navbar-fixed-bottom">
 
-            Progetto realizzato da:<br>
+            Project made by:<br>
 
             <b>Andrea Pascali </b> & <b>Domenico Fasano</b><br>
         </footer>

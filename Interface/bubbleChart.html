@@ -37,11 +37,10 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">TweetAnalysis</a>
+                <a class="navbar-brand" href="#">TweetAnalysis</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li class="menuUp"><a href="index.html">Homepage</a></li>
                     <li class="menuUp"><a href="graph.html">Graph</a></li>
                     <li class="menuUp"><a class="active" href="bubbleChart.html">Bubble Chart</a></li>
                 </ul>
@@ -58,27 +57,33 @@
     <div>
         <br>
         <div id="resultScroll"></div>
-        <!--<div id="resultScroll"></div>-->
         <div class="row">
+
             <div class="col-sm-9 text-left">
-                <div id="d3matrix" align="center"></div>
+                <div ng-hide="viewResult">
+                    <div class="demo">
+                        <h1>Threshold too high</h1><br>
+                    </div>
+                </div>
+                <div id="d3matrix" align="center" ng-show="viewResult"></div>
             </div>
             <div class="col-sm-3">
                 <br><br>
                 <form>
-                    <label>Limite peso Link: </label>
+                    <label>Bubble threshold: </label>
                     <br>
                     <p class="error"><b>{{errorInput}}</b></p>
-                    <input type="number" value="{{minLink}}" name="linkThreshold" id="linkThreshold" min="1" required>
+                    <input type="number" value="{{minBubble}}" name="bubbleThreshold" id="bubbleThreshold" min="1"
+                           required>
                     <br><br>
-                    <button type="button" id="submitInfoGraph" class="btn btn-success"
+                    <button type="button" id="submitInfoBubble" class="btn btn-success"
                             ng-click="sendInfo()">
                         Load
                     </button>
                 </form>
             </div>
-
         </div>
+
 
         <br><br><br><br>
         <footer class="container-fluid text-center navbar-fixed-bottom">

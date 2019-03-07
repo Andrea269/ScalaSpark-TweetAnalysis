@@ -221,7 +221,7 @@ object ScalaTweetAnalysis7 {
     var textBubbleChart = "var dataset = {\n    \"children\": ["
     var textGraph = "var dataset ={\n  \"nodes\": ["
     for (i <- hashtagCounterMap) {
-      val valueSentiment= hashtagSentimentMap.getOrElse(i._1, (2,1))
+      val valueSentiment= hashtagSentimentMap.getOrElse(i._1, (31))
       count += 1
       textBubbleChart += "\n        {\n            \"name\": \"" + i._1
       textBubbleChart += "\",\n            \"count\": " + i._2.toString

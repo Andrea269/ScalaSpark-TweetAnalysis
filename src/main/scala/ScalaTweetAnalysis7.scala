@@ -21,7 +21,6 @@ object ScalaTweetAnalysis7 {
   var hashtagSentimentMap: Map[String, (Int,Int)] = scala.collection.immutable.Map[String, (Int,Int)]()
   var edgeMap: Map[(String, String), Int] = scala.collection.immutable.Map[(String, String), Int]()
   var nodeHigherEdgeValueMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]()
-  val percent: Int = 30
 
   /**
     *
@@ -30,14 +29,15 @@ object ScalaTweetAnalysis7 {
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
-    if (args.length < 7) {
+    if (args.length < 9) {
       //controlla che tutti i parametri necessari siano stati forniti in input
-      System.err.println("Provide input:<ConsumerKey><ConsumerSecret><accessToken><accessTokenSecret><pathInput><pathOutput><numberRun>")
+      System.err.println("Provide input:<ConsumerKey><ConsumerSecret><AccessToken><AccessTokenSecret><PathInput><PathOutput><NumberRun><TimeRun><PercentHashtag>")
       System.exit(1)
     }
     val pathInput = args(4)
     val pathOutput = args(5)
     val numRun = args(6)
+    val percent = args(8).toInt
     val sparkConf = new SparkConf() //configura spark
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
     val sc = new SparkContext(sparkConf)
@@ -51,7 +51,7 @@ object ScalaTweetAnalysis7 {
     edgeMap = serializeMap(pathInput + "edgeMap", edgeMap.map(t => (t._1._1 + "," + t._1._2, t._2))).map(t => ((t._1.split(",")(0), t._1.split(",")(1)), t._2))
     hashtagSentimentMap = serializeMapDoubleInt(pathInput + "hashtagSentimentMap", hashtagSentimentMap)
     if (numRun.equals("TypeRun1"))
-      writeFile(pathOutput + "HashtagRun", getTopHashtag)
+      writeFile(pathOutput + "HashtagRun", getTopHashtag(percent))
     else {
       for (a <- hashtagCounterMap) {
         nodeHigherEdgeValueMap += a._1 -> 0
@@ -79,7 +79,7 @@ object ScalaTweetAnalysis7 {
     */
   def downloadComputeTweet(sc: SparkContext, args: Array[String]): Unit = {
     val ssc = new StreamingContext(sc, Seconds(1)) //crea il contesto di streaming con un intervallo di X secondi
-    var timeRun = readFile(args(4) + "Time").map(t => t.split("=")(1))
+    val timeRun = args(7).toLong
     val tweetsDownload = downloadTweet(ssc, args, args(4) + "HashtagRun").filter(_.getLang() == "en")
     val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
@@ -94,7 +94,7 @@ object ScalaTweetAnalysis7 {
     }))
 
     ssc.start() //avvia lo stream e la computazione dei tweet
-    Thread.sleep(if (args(6).equals("TypeRun1")) timeRun(0).toLong else timeRun(1).toLong) //setta il tempo di esecuzione
+    Thread.sleep(timeRun) //setta il tempo di esecuzione
     ssc.stop(true, true) //ferma lo StreamingContext
   }
 
@@ -210,7 +210,7 @@ object ScalaTweetAnalysis7 {
     *
     * @return
     */
-  def getTopHashtag: String = {
+  def getTopHashtag(percent: Int): String = {
     val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
     var topHashtag = ""
     for (i <- 0 to orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
@@ -227,7 +227,7 @@ object ScalaTweetAnalysis7 {
     var textBubbleChart = "var dataset = {\n    \"children\": ["
     var textGraph = "var dataset ={\n  \"nodes\": ["
     for (i <- hashtagCounterMap) {
-      val valueSentiment= hashtagSentimentMap.getOrElse(i._1, (31))
+      val valueSentiment= hashtagSentimentMap.getOrElse(i._1, (3,1))
       count += 1
       textBubbleChart += "\n        {\n            \"name\": \"" + i._1
       textBubbleChart += "\",\n            \"count\": " + i._2.toString

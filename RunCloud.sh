@@ -1,7 +1,16 @@
 #!/bin/bash
 RUN_SESSION=20181122114000
 
-NUM_RUN=2
+NUM_RUN_TYPE1=2
+CONSUMER_KEY="efTcZmWVuIOC9gncfFBb4Fnav"
+CONSUMER_KEY_SECRET="SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa"
+ACCESS_TOKEN="1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR"
+ACCESS_TOKEN_SECRET="liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6"
+PATH_INPUT="gs://bucket-twitter/input/"
+PATH_OUTPUT="gs://bucket-twitter/output/"
+TIME_RUN_TYPE1=15000
+TIME_RUN_TYPE2=10000
+PERCENT=30
 
 GCP_PROJECT=mytweetanalysis2
 GCS_SRC_BUCKET_NAME=bucket-twitter
@@ -31,7 +40,7 @@ echo "==========================================================================
 
 
 #run job Type 1 for N time$
-for i in $(seq 1 $NUM_RUN); do
+for i in $(seq 1 $NUM_RUN_TYPE1); do
 
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
@@ -39,7 +48,7 @@ echo "==========================================================================
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- efTcZmWVuIOC9gncfFBb4Fnav SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa 1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6 gs://bucket-twitter/input/ gs://bucket-twitter/input/ TypeRun1
+      -- CONSUMER_KEY CONSUMER_KEY_SECRET ACCESS_TOKEN ACCESS_TOKEN_SECRET PATH_INPUT PATH_INPUT TypeRun1 TIME_RUN_TYPE1 PERCENT
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
@@ -53,7 +62,7 @@ echo "==========================================================================
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- efTcZmWVuIOC9gncfFBb4Fnav SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa 1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6 gs://bucket-twitter/input/ gs://bucket-twitter/output/ TypeRun2
+      -- CONSUMER_KEY CONSUMER_KEY_SECRET ACCESS_TOKEN ACCESS_TOKEN_SECRET PATH_INPUT PATH_OUTPUT TypeRun2 TIME_RUN_TYPE2 PERCENT
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="

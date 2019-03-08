@@ -19,7 +19,7 @@ object TweetCompute {
     * Given a a string, it extracts the hashtags and the sentiment of that string.
     * Also print on the console the text under computation to have a feedback of the streaming of tweets during the execution.
     *
-    * @param textT: A string containing english language and hashtags
+    * @param textT : A string containing english language and hashtags
     * @return A tuple made of 1) an array made of hashtags found in the parameter; 2)a value from 1 to 5 that represents the sentiment according to the following enumeration:
     *         1: Very Negative
     *         2: Negative
@@ -60,7 +60,7 @@ object TweetCompute {
     if (input == null) " " else
       input.split("\\s+") //the regex splits when found the following symbols(' ')|('\n')|('\t')|('\r')
         .filterNot(p => p.length > 4 && p.take(4).toString.equals("http"))
-        .filterNot(p => p.length>1 && p(0).toString.equals("@"))
+        .filterNot(p => p.length > 1 && p(0).toString.equals("@"))
         .foldLeft("")((x, y) => x + " " + y)
   }
 
@@ -70,7 +70,6 @@ object TweetCompute {
     * @param input A string containing english language and hashtags
     * @return
     */
-
   def computesSentiment(input: String): Int = {
     val props = new Properties()
     props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")

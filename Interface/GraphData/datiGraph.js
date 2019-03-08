@@ -1,335 +1,220 @@
 var dataset ={
   "nodes": [
     {
-      "name": "#TrumpFail",
-      "group": 1,
+      "name": "#WWG1WGA",
+      "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#MarchForOurLives",
-      "group": 1,
+      "name": "#GOP",
+      "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#NetNeutrality",
-      "group": 1,
+      "name": "#Ellis",
+      "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#IndictTrumpNow",
-      "group": 1,
+      "name": "#tcot",
+      "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#TrumpRussia",
-      "group": 1,
+      "name": "#Qanon",
+      "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#TimesUp",
-      "group": 1,
+      "name": "#Manafort's",
+      "group": 4,
       "weightMax": 1
+    },
+    {
+      "name": "#DEMs",
+      "group": 4,
+      "weightMax": 1
+    },
+    {
+      "name": "#US",
+      "group": 4,
+      "weightMax": 1
+    },
+    {
+      "name": "#COLLUSION",
+      "group": 4,
+      "weightMax": 1
+    },
+    {
+      "name": "#Ivanka",
+      "group": 2,
+      "weightMax": 2
+    },
+    {
+      "name": "#BernieSanders",
+      "group": 4,
+      "weightMax": 1
+    },
+    {
+      "name": "#FBR",
+      "group": 2,
+      "weightMax": 2
     },
     {
       "name": "#MAGA",
-      "group": 1,
+      "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#BoycottFoxNews",
+      "name": "#Trump",
       "group": 1,
-      "weightMax": 1
+      "weightMax": 2
     },
     {
-      "name": "#ImpeachTrump",
-      "group": 1,
-      "weightMax": 1
-    },
-    {
-      "name": "#TRUMP",
-      "group": 1,
-      "weightMax": 1
-    },
-    {
-      "name": "#TrumpHandsOffVenezuela",
-      "group": 1,
-      "weightMax": 1
+      "name": "#Resist",
+      "group": 2,
+      "weightMax": 2
     }
   ],
   "links": [
     {
-      "source": "#MAGA",
-      "target": "#MarchForOurLives",
-      "weight": 1
-    },
-    {
-      "source": "#IndictTrumpNow",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#MarchForOurLives",
-      "target": "#TimesUp",
-      "weight": 1
-    },
-    {
-      "source": "#NetNeutrality",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#ImpeachTrump",
-      "target": "#TimesUp",
-      "weight": 1
-    },
-    {
-      "source": "#ImpeachTrump",
-      "target": "#IndictTrumpNow",
+      "source": "#COLLUSION",
+      "target": "#Manafort's",
       "weight": 1
     },
     {
       "source": "#MAGA",
-      "target": "#TRUMP",
+      "target": "#US",
       "weight": 1
     },
     {
-      "source": "#NetNeutrality",
-      "target": "#TrumpFail",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
-      "target": "#MarchForOurLives",
-      "weight": 1
-    },
-    {
-      "source": "#TRUMP",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#MAGA",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#ImpeachTrump",
+      "source": "#DEMs",
       "target": "#MAGA",
       "weight": 1
     },
     {
-      "source": "#MAGA",
-      "target": "#TrumpFail",
+      "source": "#Ivanka",
+      "target": "#Resist",
+      "weight": 2
+    },
+    {
+      "source": "#DEMs",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#IndictTrumpNow",
-      "target": "#NetNeutrality",
+      "source": "#Trump",
+      "target": "#WWG1WGA",
       "weight": 1
     },
     {
-      "source": "#TRUMP",
-      "target": "#TimesUp",
+      "source": "#COLLUSION",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#TrumpHandsOffVenezuela",
-      "target": "#TrumpRussia",
+      "source": "#COLLUSION",
+      "target": "#Ellis",
       "weight": 1
     },
     {
-      "source": "#BoycottFoxNews",
-      "target": "#TrumpFail",
-      "weight": 1
-    },
-    {
-      "source": "#TrumpFail",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#IndictTrumpNow",
-      "target": "#TRUMP",
-      "weight": 1
-    },
-    {
-      "source": "#MAGA",
-      "target": "#NetNeutrality",
-      "weight": 1
-    },
-    {
-      "source": "#MarchForOurLives",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#MAGA",
-      "target": "#TimesUp",
-      "weight": 1
-    },
-    {
-      "source": "#ImpeachTrump",
-      "target": "#TrumpFail",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
-      "target": "#TimesUp",
-      "weight": 1
-    },
-    {
-      "source": "#MarchForOurLives",
-      "target": "#TrumpHandsOffVenezuela",
-      "weight": 1
-    },
-    {
-      "source": "#TimesUp",
-      "target": "#TrumpHandsOffVenezuela",
-      "weight": 1
-    },
-    {
-      "source": "#IndictTrumpNow",
-      "target": "#MarchForOurLives",
-      "weight": 1
-    },
-    {
-      "source": "#TimesUp",
-      "target": "#TrumpFail",
-      "weight": 1
-    },
-    {
-      "source": "#MAGA",
-      "target": "#TrumpHandsOffVenezuela",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
+      "source": "#GOP",
       "target": "#MAGA",
       "weight": 1
     },
     {
-      "source": "#TrumpFail",
-      "target": "#TrumpHandsOffVenezuela",
+      "source": "#FBR",
+      "target": "#Ivanka",
+      "weight": 2
+    },
+    {
+      "source": "#Ellis",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#ImpeachTrump",
-      "target": "#NetNeutrality",
+      "source": "#Qanon",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#ImpeachTrump",
-      "target": "#MarchForOurLives",
+      "source": "#Ivanka",
+      "target": "#Trump",
+      "weight": 2
+    },
+    {
+      "source": "#FBR",
+      "target": "#Resist",
+      "weight": 2
+    },
+    {
+      "source": "#BernieSanders",
+      "target": "#tcot",
       "weight": 1
     },
     {
-      "source": "#ImpeachTrump",
-      "target": "#TRUMP",
+      "source": "#GOP",
+      "target": "#US",
       "weight": 1
     },
     {
-      "source": "#NetNeutrality",
-      "target": "#TimesUp",
+      "source": "#DEMs",
+      "target": "#GOP",
       "weight": 1
     },
     {
-      "source": "#ImpeachTrump",
-      "target": "#TrumpRussia",
+      "source": "#Resist",
+      "target": "#Trump",
+      "weight": 2
+    },
+    {
+      "source": "#Trump",
+      "target": "#tcot",
       "weight": 1
     },
     {
-      "source": "#NetNeutrality",
-      "target": "#TRUMP",
+      "source": "#MAGA",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#IndictTrumpNow",
-      "target": "#MAGA",
+      "source": "#BernieSanders",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#BoycottFoxNews",
-      "target": "#TRUMP",
+      "source": "#FBR",
+      "target": "#Trump",
+      "weight": 2
+    },
+    {
+      "source": "#Ellis",
+      "target": "#Manafort's",
       "weight": 1
     },
     {
-      "source": "#TRUMP",
-      "target": "#TrumpFail",
+      "source": "#Qanon",
+      "target": "#WWG1WGA",
       "weight": 1
     },
     {
-      "source": "#BoycottFoxNews",
-      "target": "#IndictTrumpNow",
+      "source": "#GOP",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#TRUMP",
-      "target": "#TrumpHandsOffVenezuela",
+      "source": "#Trump",
+      "target": "#US",
       "weight": 1
     },
     {
-      "source": "#IndictTrumpNow",
-      "target": "#TrumpHandsOffVenezuela",
+      "source": "#DEMs",
+      "target": "#US",
       "weight": 1
     },
     {
-      "source": "#IndictTrumpNow",
-      "target": "#TrumpFail",
-      "weight": 1
-    },
-    {
-      "source": "#NetNeutrality",
-      "target": "#TrumpHandsOffVenezuela",
-      "weight": 1
-    },
-    {
-      "source": "#MarchForOurLives",
-      "target": "#TrumpFail",
-      "weight": 1
-    },
-    {
-      "source": "#MarchForOurLives",
-      "target": "#NetNeutrality",
-      "weight": 1
-    },
-    {
-      "source": "#ImpeachTrump",
-      "target": "#TrumpHandsOffVenezuela",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
-      "target": "#ImpeachTrump",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
-      "target": "#NetNeutrality",
-      "weight": 1
-    },
-    {
-      "source": "#IndictTrumpNow",
-      "target": "#TimesUp",
-      "weight": 1
-    },
-    {
-      "source": "#MarchForOurLives",
-      "target": "#TRUMP",
-      "weight": 1
-    },
-    {
-      "source": "#TimesUp",
-      "target": "#TrumpRussia",
-      "weight": 1
-    },
-    {
-      "source": "#BoycottFoxNews",
-      "target": "#TrumpHandsOffVenezuela",
+      "source": "#Manafort's",
+      "target": "#Trump",
       "weight": 1
     }
   ]

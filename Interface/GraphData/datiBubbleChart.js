@@ -1,48 +1,64 @@
 var dataset = {
     "children": [
         {
-            "name": "#TrumpFail",
+            "name": "#WWG1WGA",
             "count": 1
         },
         {
-            "name": "#MarchForOurLives",
+            "name": "#GOP",
             "count": 1
         },
         {
-            "name": "#NetNeutrality",
+            "name": "#Ellis",
             "count": 1
         },
         {
-            "name": "#IndictTrumpNow",
+            "name": "#tcot",
             "count": 1
         },
         {
-            "name": "#TrumpRussia",
+            "name": "#Qanon",
             "count": 1
         },
         {
-            "name": "#TimesUp",
+            "name": "#Manafort's",
             "count": 1
+        },
+        {
+            "name": "#DEMs",
+            "count": 1
+        },
+        {
+            "name": "#US",
+            "count": 1
+        },
+        {
+            "name": "#COLLUSION",
+            "count": 1
+        },
+        {
+            "name": "#Ivanka",
+            "count": 2
+        },
+        {
+            "name": "#BernieSanders",
+            "count": 1
+        },
+        {
+            "name": "#FBR",
+            "count": 2
         },
         {
             "name": "#MAGA",
             "count": 1
         },
         {
-            "name": "#BoycottFoxNews",
-            "count": 1
+            "name": "#Trump",
+            "count": 7
         },
         {
-            "name": "#ImpeachTrump",
-            "count": 1
-        },
-        {
-            "name": "#TRUMP",
-            "count": 1
-        },
-        {
-            "name": "#TrumpHandsOffVenezuela",
-            "count": 1
+            "name": "#Resist",
+            "count": 2
         }
     ]
 };

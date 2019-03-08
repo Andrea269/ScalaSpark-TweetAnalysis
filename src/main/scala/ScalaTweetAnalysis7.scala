@@ -46,7 +46,7 @@ object ScalaTweetAnalysis7 {
     val pathInput = args(4)
     val pathOutput = args(5)
     val typeRun = args(6)
-    val percent = args(8).toInt
+    val percent: Int = args(8).toInt
 
     val sparkConf = new SparkConf()
     sparkConf.setAppName("ScalaTweetAnalysis7").setMaster("local[*]")
@@ -64,11 +64,11 @@ object ScalaTweetAnalysis7 {
       for (a <- hashtagCounterMap) {
         nodeHigherEdgeValueMap += a._1 -> 0
       }
-      for(b <- edgeMap) {
-        if(b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._1, 0)) {
+      for (b <- edgeMap) {
+        if (b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._1, 0)) {
           nodeHigherEdgeValueMap += b._1._1 -> b._2
         }
-        if(b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._2, 0)) {
+        if (b._2 > nodeHigherEdgeValueMap.getOrElse(b._1._2, 0)) {
           nodeHigherEdgeValueMap += b._1._2 -> b._2
         }
       }
@@ -82,9 +82,20 @@ object ScalaTweetAnalysis7 {
     }
   }
 
+  /** todo
+    * Setta il contesto di streaming e invoca il dawload dei tweet, in seguito ne esegue la computazione estraendo
+    * per ogni tweet il sentimento e l'insieme degli hashtag presenti
+    * Successivamente popola le 3 strutture dati precedentemente descritte, ovvero:
+    * hashtagCounterMap
+    * hashtagSentimentMap
+    * edgeMap
+    *
+    * @param sc   viene passato alla funzione lo SparkContext
+    * @param args viene passato alla funzione l'array con gli argomenti di input al programma
+    */
   def downloadComputeTweet(sc: SparkContext, args: Array[String]): Unit = {
     val ssc = new StreamingContext(sc, Seconds(1)) //create the streaming context with mini-batch of 1 seconds
-    val timeRun = args(7).toLong
+    val timeRun: Long = args(7).toLong
     val tweetsDownload = downloadTweet(ssc, args, args(4) + "HashtagRun").filter(_.getLang() == "en")
     val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
       .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
@@ -93,7 +104,7 @@ object ScalaTweetAnalysis7 {
 
     tweetEdit.foreachRDD(p => p.foreach(t => for (y <- t._1) {
       hashtagCounterMap += y -> (hashtagCounterMap.getOrElse(y, 0) + 1)
-      hashtagSentimentMap += y -> (hashtagSentimentMap.getOrElse(y, 3)+ t._2)
+      hashtagSentimentMap += y -> (hashtagSentimentMap.getOrElse(y, 3) + t._2)
       for (i <- t._1) if (y > i) edgeMap += (i, y) -> (edgeMap.getOrElse((i, y), 0) + 1)
     }))
 
@@ -102,12 +113,12 @@ object ScalaTweetAnalysis7 {
     ssc.stop(true, true)
   }
 
-  /**
-    * crea lo stream per scaricare i tweet applicando o meno un filtro
+  /** todo
+    * Esegue il download dei tweet applicando o meno un filtro indicante gli hashtag che devono essere presenti nei tweet scaricati
     *
-    * @param ssc
-    * @param args
-    * @param pathFilter
+    * @param ssc        viene passato alla funzione lo StreamingContext
+    * @param args       viene passato alla funzione l'array con gli argomenti di input al programma
+    * @param pathFilter viene passato alla funzione l'array contenente l'elenco degli hashtag che devono essere presenti nei tweet scaricati
     * @return
     */
   private def downloadTweet(ssc: StreamingContext, args: Array[String], pathFilter: String): ReceiverInputDStream[Status] = {
@@ -130,14 +141,15 @@ object ScalaTweetAnalysis7 {
     if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
   }
 
-  /**
+  /** todo
+    * Serializza in un file una mappa applicando una codifica personalizzata del tipo chiave=valore
     *
-    * @param filename
-    * @param mapSerialize
+    * @param pathFilename il path seguito dal nome del file su cui salvare la serializzazione
+    * @param mapSerialize rappresenta la mappa da serializzare, la quale deve avere come chiave una Stringa e come valore un Intero
     */
-  private def serializeMap(filename: String, mapSerialize: Map[String, Int]): Map[String, Int] = {
+  private def serializeMap(pathFilename: String, mapSerialize: Map[String, Int]): Map[String, Int] = {
     var mapToSerialize = mapSerialize
-    val fileCountHashtag = readFile(filename).map(t => t.split("="))
+    val fileCountHashtag = readFile(pathFilename).map(t => t.split("="))
     var countHashtag: Int = 0
     if (!(fileCountHashtag(0).length < 2))
       for (a <- fileCountHashtag) mapToSerialize += a(0) -> (mapToSerialize.getOrElse(a(0), 0) + a(1).toInt)
@@ -145,7 +157,7 @@ object ScalaTweetAnalysis7 {
     var text = ""
     for (hashtag <- mapToSerialize) text += hashtag._1 + "=" + hashtag._2.toString + "\n"
 
-    writeFile(filename, text)
+    writeFile(pathFilename, text)
     mapToSerialize
   }
 
@@ -153,13 +165,14 @@ object ScalaTweetAnalysis7 {
     writeFile(filename, "")
   }
 
-  /**
+  /** todo
+    * Tale funzione ci permette di leggere un file indipendentemente dal file system istanziato sulla macchina che la invoca
     *
-    * @param filename
+    * @param pathFilename il path seguito dal nome del file su cui andare a leggere il file
     * @return
     */
-  private def readFile(filename: String): Array[String] = {
-    val hadoopPath = new Path(filename)
+  private def readFile(pathFilename: String): Array[String] = {
+    val hadoopPath = new Path(pathFilename)
     val inputStream: FSDataInputStream = hadoopPath.getFileSystem(new Configuration()).open(hadoopPath)
     val wrappedStream = inputStream.getWrappedStream
     var textFile: String = ""
@@ -172,13 +185,14 @@ object ScalaTweetAnalysis7 {
     textFile.split("\n")
   }
 
-  /**
+  /** todo
+    * Tale funzione ci permette di scrivere un file indipendentemente dal file system istanziato sulla macchina che la invoca
     *
-    * @param filename
-    * @param text
+    * @param pathFilename il path seguito dal nome del file su cui scrivere
+    * @param text         testo da scrivere sul file
     */
-  private def writeFile(filename: String, text: String): Unit = {
-    val hadoopPath = new Path(filename)
+  private def writeFile(pathFilename: String, text: String): Unit = {
+    val hadoopPath = new Path(pathFilename)
     val outputPath: FSDataOutputStream = hadoopPath.getFileSystem(new Configuration()).create(hadoopPath)
     val wrappedStream = outputPath.getWrappedStream
     for (i <- text) {
@@ -187,20 +201,24 @@ object ScalaTweetAnalysis7 {
     wrappedStream.close()
   }
 
-  /**
+  /** todo
+    * Tale funzione estrae la percentuale X più siglificativa dell'insieme di hashtag rilevati e la restituisce in output
     *
-    * @return
+    * @param percent percentuale di hashtag da estrarre
+    * @return lista dei top hashtag estratti
     */
- private def getTopHashtag(percent: Int): String = {
+  private def getTopHashtag(percent: Int): String = {
     val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
     var topHashtag = ""
     for (i <- 0 to orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
     topHashtag
   }
 
-  /**
+  /** todo vedi te di scriverlo meglio ma è quello che fà
+    * genera e successivamente salva su file i dataset contenenti i dati per la visualizzazione del
+    * grafo e del bubbleChart rappresentanti i le analisi eseguite sui tweet
     *
-    * @param pathOutput
+    * @param pathOutput path di output dei file generati dalla funzione
     */
   private def graphComputation(pathOutput: String): Unit = {
     val numberHashtag = hashtagCounterMap.size
@@ -214,7 +232,7 @@ object ScalaTweetAnalysis7 {
       textBubbleChart += "\n        }"
 
       textGraph += "\n    {\n      \"name\": \"" + i._1
-      textGraph += "\",\n      \"group\": " + hashtagSentimentMap.getOrElse(i._1, 3)/i._2
+      textGraph += "\",\n      \"group\": " + hashtagSentimentMap.getOrElse(i._1, 3) / i._2
       textGraph += ",\n      \"weightMax\": " + nodeHigherEdgeValueMap.getOrElse(i._1, 0)
       textGraph += "\n    }"
 
@@ -241,3 +259,5 @@ object ScalaTweetAnalysis7 {
     writeFile(pathOutput + "datiGraph.js", textGraph)
   }
 }
+
+//todo toglilo per ultimo altrimenti non rileva gli altri todo, almeno a me era così

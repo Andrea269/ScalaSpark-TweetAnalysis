@@ -6,59 +6,39 @@ var dataset ={
       "weightMax": 1
     },
     {
-      "name": "#GOP",
-      "group": 4,
-      "weightMax": 1
-    },
-    {
-      "name": "#Ellis",
-      "group": 4,
-      "weightMax": 1
-    },
-    {
-      "name": "#tcot",
-      "group": 4,
-      "weightMax": 1
-    },
-    {
       "name": "#Qanon",
       "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#Manafort's",
+      "name": "#KAG",
       "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#DEMs",
+      "name": "#AMJoy",
+      "group": 1,
+      "weightMax": 4
+    },
+    {
+      "name": "#CNN",
       "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#US",
+      "name": "#FoxandFriends",
       "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#COLLUSION",
+      "name": "#SaturdayMorning",
       "group": 4,
       "weightMax": 1
     },
     {
-      "name": "#Ivanka",
-      "group": 2,
-      "weightMax": 2
-    },
-    {
-      "name": "#BernieSanders",
+      "name": "#Tcot",
       "group": 4,
       "weightMax": 1
-    },
-    {
-      "name": "#FBR",
-      "group": 2,
-      "weightMax": 2
     },
     {
       "name": "#MAGA",
@@ -66,40 +46,65 @@ var dataset ={
       "weightMax": 1
     },
     {
-      "name": "#Trump",
-      "group": 1,
-      "weightMax": 2
+      "name": "#ccot",
+      "group": 4,
+      "weightMax": 1
     },
     {
-      "name": "#Resist",
-      "group": 2,
-      "weightMax": 2
+      "name": "#Trump",
+      "group": 1,
+      "weightMax": 4
     }
   ],
   "links": [
     {
-      "source": "#COLLUSION",
-      "target": "#Manafort's",
+      "source": "#SaturdayMorning",
+      "target": "#WWG1WGA",
       "weight": 1
     },
     {
-      "source": "#MAGA",
-      "target": "#US",
-      "weight": 1
-    },
-    {
-      "source": "#DEMs",
+      "source": "#CNN",
       "target": "#MAGA",
       "weight": 1
     },
     {
-      "source": "#Ivanka",
-      "target": "#Resist",
-      "weight": 2
+      "source": "#WWG1WGA",
+      "target": "#ccot",
+      "weight": 1
     },
     {
-      "source": "#DEMs",
+      "source": "#KAG",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#KAG",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
       "target": "#Trump",
+      "weight": 1
+    },
+    {
+      "source": "#SaturdayMorning",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#Qanon",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#SaturdayMorning",
       "weight": 1
     },
     {
@@ -108,29 +113,59 @@ var dataset ={
       "weight": 1
     },
     {
-      "source": "#COLLUSION",
+      "source": "#MAGA",
+      "target": "#SaturdayMorning",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#SaturdayMorning",
       "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#COLLUSION",
-      "target": "#Ellis",
+      "source": "#CNN",
+      "target": "#Trump",
       "weight": 1
     },
     {
-      "source": "#GOP",
+      "source": "#KAG",
+      "target": "#Qanon",
+      "weight": 1
+    },
+    {
+      "source": "#MAGA",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
       "target": "#MAGA",
       "weight": 1
     },
     {
-      "source": "#FBR",
-      "target": "#Ivanka",
-      "weight": 2
-    },
-    {
-      "source": "#Ellis",
+      "source": "#KAG",
       "target": "#Trump",
       "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#SaturdayMorning",
+      "weight": 1
+    },
+    {
+      "source": "#Trump",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#AMJoy",
+      "target": "#Trump",
+      "weight": 4
     },
     {
       "source": "#Qanon",
@@ -138,38 +173,33 @@ var dataset ={
       "weight": 1
     },
     {
-      "source": "#Ivanka",
+      "source": "#FoxandFriends",
+      "target": "#KAG",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#Tcot",
       "target": "#Trump",
-      "weight": 2
-    },
-    {
-      "source": "#FBR",
-      "target": "#Resist",
-      "weight": 2
-    },
-    {
-      "source": "#BernieSanders",
-      "target": "#tcot",
       "weight": 1
     },
     {
-      "source": "#GOP",
-      "target": "#US",
+      "source": "#CNN",
+      "target": "#Qanon",
       "weight": 1
     },
     {
-      "source": "#DEMs",
-      "target": "#GOP",
-      "weight": 1
-    },
-    {
-      "source": "#Resist",
-      "target": "#Trump",
-      "weight": 2
-    },
-    {
-      "source": "#Trump",
-      "target": "#tcot",
+      "source": "#MAGA",
+      "target": "#ccot",
       "weight": 1
     },
     {
@@ -178,18 +208,53 @@ var dataset ={
       "weight": 1
     },
     {
-      "source": "#BernieSanders",
-      "target": "#Trump",
+      "source": "#CNN",
+      "target": "#SaturdayMorning",
       "weight": 1
     },
     {
-      "source": "#FBR",
-      "target": "#Trump",
-      "weight": 2
+      "source": "#MAGA",
+      "target": "#Qanon",
+      "weight": 1
     },
     {
-      "source": "#Ellis",
-      "target": "#Manafort's",
+      "source": "#Tcot",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#CNN",
+      "target": "#FoxandFriends",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#KAG",
+      "target": "#WWG1WGA",
+      "weight": 1
+    },
+    {
+      "source": "#SaturdayMorning",
+      "target": "#Tcot",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#MAGA",
       "weight": 1
     },
     {
@@ -198,23 +263,28 @@ var dataset ={
       "weight": 1
     },
     {
-      "source": "#GOP",
-      "target": "#Trump",
+      "source": "#Tcot",
+      "target": "#WWG1WGA",
       "weight": 1
     },
     {
-      "source": "#Trump",
-      "target": "#US",
+      "source": "#Qanon",
+      "target": "#SaturdayMorning",
       "weight": 1
     },
     {
-      "source": "#DEMs",
-      "target": "#US",
+      "source": "#Qanon",
+      "target": "#Tcot",
       "weight": 1
     },
     {
-      "source": "#Manafort's",
-      "target": "#Trump",
+      "source": "#KAG",
+      "target": "#ccot",
+      "weight": 1
+    },
+    {
+      "source": "#FoxandFriends",
+      "target": "#Qanon",
       "weight": 1
     }
   ]

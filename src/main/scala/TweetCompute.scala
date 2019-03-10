@@ -43,7 +43,7 @@ object TweetCompute {
   private def extractHashtags(input: String): Array[String] = {
     var hashtag = if (input == null) Array(" ") else
       input.split("\\s+") //the regex splits when found the following symbols(' ')|('\n')|('\t')|('\r')
-        .filter(p => p(0).toString.equals("#") && p.length > 1) //extract hashtags
+        .filter(p => p(0).toString.equals("#") && p.length > 1 && p.split("[^\\w']+").size>1) //extract hashtags
     for (i <- hashtag.indices) {
       hashtag(i) = "#" + hashtag(i).split("[^\\w']+")(1) //accept only letters, numbers and the apostrophe
     }

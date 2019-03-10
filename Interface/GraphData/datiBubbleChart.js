@@ -5,60 +5,44 @@ var dataset = {
             "count": 1
         },
         {
-            "name": "#GOP",
-            "count": 1
-        },
-        {
-            "name": "#Ellis",
-            "count": 1
-        },
-        {
-            "name": "#tcot",
-            "count": 1
-        },
-        {
             "name": "#Qanon",
             "count": 1
         },
         {
-            "name": "#Manafort's",
+            "name": "#KAG",
             "count": 1
         },
         {
-            "name": "#DEMs",
+            "name": "#AMJoy",
+            "count": 4
+        },
+        {
+            "name": "#CNN",
             "count": 1
         },
         {
-            "name": "#US",
+            "name": "#FoxandFriends",
             "count": 1
         },
         {
-            "name": "#COLLUSION",
+            "name": "#SaturdayMorning",
             "count": 1
         },
         {
-            "name": "#Ivanka",
-            "count": 2
-        },
-        {
-            "name": "#BernieSanders",
+            "name": "#Tcot",
             "count": 1
-        },
-        {
-            "name": "#FBR",
-            "count": 2
         },
         {
             "name": "#MAGA",
             "count": 1
         },
         {
-            "name": "#Trump",
-            "count": 7
+            "name": "#ccot",
+            "count": 1
         },
         {
-            "name": "#Resist",
-            "count": 2
+            "name": "#Trump",
+            "count": 6
         }
     ]
 };

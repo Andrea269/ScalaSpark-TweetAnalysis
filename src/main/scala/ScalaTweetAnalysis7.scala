@@ -119,7 +119,7 @@ object ScalaTweetAnalysis7 {
     *
     * @param ssc        viene passato alla funzione lo StreamingContext
     * @param args       viene passato alla funzione l'array con gli argomenti di input al programma
-    * @param pathInput viene passato alla funzione l'array contenente l'elenco degli hashtag che devono essere presenti nei tweet scaricati
+    * @param pathInput path file input
     * @return
     */
   private def downloadTweet(ssc: StreamingContext, args: Array[String], pathInput: String): ReceiverInputDStream[Status] = {
@@ -145,7 +145,7 @@ object ScalaTweetAnalysis7 {
   /**todo
     * Estrae gli hashtag da usare durante il download
     *
-    * @param path il path seguito dal nome del file su cui andare a leggere il file
+    * @param path il path dei file di input
     * @return array con i filtri per il download
     */
   private def extractFilter(path: String): Array[String] = {

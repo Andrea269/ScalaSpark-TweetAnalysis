@@ -1,6 +1,7 @@
 #!/bin/bash
 RUN_SESSION=20181122114000
 
+LOCAL_OUTPUT_PATH="/home/intersect/Desktop/localCloud"
 NUM_RUN_TYPE1=2
 CONSUMER_KEY="efTcZmWVuIOC9gncfFBb4Fnav"
 CONSUMER_KEY_SECRET="SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa"
@@ -27,8 +28,6 @@ DATAPROC_CLUSTER_NAME=twitter-test-cluster-${RUN_SESSION}
 DATAPROC_CLUSTER_REGION=europe-west1
 DATAPROC_CLUSTER_ZONE=europe-west1-d
 
-LOCAL_OUTPUT_PATH=/home/intersect/Desktop/localCloud
-
 #create cluster
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+ "STARTING CLUSTER '${DATAPROC_CLUSTER_NAME}' ..."
@@ -48,7 +47,7 @@ echo "==========================================================================
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- CONSUMER_KEY CONSUMER_KEY_SECRET ACCESS_TOKEN ACCESS_TOKEN_SECRET PATH_INPUT PATH_INPUT TypeRun1 TIME_RUN_TYPE1 PERCENT
+      -- ${CONSUMER_KEY} ${CONSUMER_KEY_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET} ${PATH_INPUT} ${PATH_INPUT} TypeRun1 ${TIME_RUN_TYPE1} ${PERCENT}
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
@@ -62,7 +61,7 @@ echo "==========================================================================
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- CONSUMER_KEY CONSUMER_KEY_SECRET ACCESS_TOKEN ACCESS_TOKEN_SECRET PATH_INPUT PATH_OUTPUT TypeRun2 TIME_RUN_TYPE2 PERCENT
+      -- ${CONSUMER_KEY} ${CONSUMER_KEY_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET} ${PATH_INPUT} ${PATH_OUTPUT} TypeRun2 ${TIME_RUN_TYPE2} ${PERCENT}
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
@@ -78,7 +77,9 @@ echo "==========================================================================
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"CLUSTER '${DATAPROC_CLUSTER_NAME}' DELETED!"
 echo "===================================================================================="
 
+
+#needs to give permission to download a file locally from a bucket
 #download output
-echo "downloading output"
-gsutil cp gs://bucket-twitter/output/* ${LOCAL_OUTPUT_PATH}
-echo "end of everything"
+#echo "downloading output"
+#gsutil cp gs://bucket-twitter/output/* ${LOCAL_OUTPUT_PATH}
+#echo "end of everything"

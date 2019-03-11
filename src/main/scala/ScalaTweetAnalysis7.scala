@@ -22,7 +22,6 @@ object ScalaTweetAnalysis7 {
   var hashtagSentimentMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]() //contains couples formed by the hashtags and the accumulator of sentiment values
   var edgeMap: Map[(String, String), Int] = scala.collection.immutable.Map[(String, String), Int]() //contains couples of hashtags with a counter of tweets in which there are both hashtags
   var nodeHigherEdgeValueMap: Map[String, Int] = scala.collection.immutable.Map[String, Int]() //contains couples formed by the hashtags and the value of their edge wtih the higher weight
-  val thresholdFilters=350
 
   /**
     *
@@ -37,6 +36,7 @@ object ScalaTweetAnalysis7 {
     *             percentHashtag: a percent number used to make the cutoff of the hashtags to be used in the successive run
     */
   def main(args: Array[String]) {
+
     Logger.getLogger("org").setLevel(Level.OFF) //remove logs from the console output
     Logger.getLogger("akka").setLevel(Level.OFF)
     if (args.length < 9) { //check that all the needed parameters are given in input
@@ -58,7 +58,7 @@ object ScalaTweetAnalysis7 {
     hashtagSentimentMap = serializeMap(pathInput + "hashtagSentimentMap", hashtagSentimentMap)
 
     if (typeRun.equals("TypeRun1"))
-      writeFile(pathOutput + "hashtag", getTopHashtag(percent))
+      writeFile(pathOutput + "HashtagRun", getTopHashtag(percent))
     else {
       //fill nodeHigherEdgeValueMap
       for (a <- hashtagCounterMap) {
@@ -76,31 +76,26 @@ object ScalaTweetAnalysis7 {
       graphComputation(pathOutput)
 
       //clean files for eventual new computations
-      cleanFile(pathInput + "hashtag")
       cleanFile(pathInput + "hashtagCounterMap")
       cleanFile(pathInput + "edgeMap")
       cleanFile(pathInput + "hashtagSentimentMap")
     }
   }
 
-  /** todo
-    * Setta il contesto di streaming e invoca il dawload dei tweet, in seguito ne esegue la computazione estraendo
-    * per ogni tweet il sentimento e l'insieme degli hashtag presenti
-    * Successivamente popola le 3 strutture dati precedentemente descritte, ovvero:
-    * hashtagCounterMap
-    * hashtagSentimentMap
-    * edgeMap
+  /**
+    *  Set the context of streaming and ask for the downloads of the tweets, then it do computations on the tweet, extracting the sentiment of the tweets
+    *  and the set of the hashtags present in them. After it fill the maps hashtagCounterMap, hashtagSentimentMap, hashtagSentimentMap and edgeMap.
     *
-    * @param sc   viene passato alla funzione lo SparkContext
-    * @param args viene passato alla funzione l'array con gli argomenti di input al programma
+    * @param sc   the SparkContext
+    * @param args the input parameters of the main
     */
   def downloadComputeTweet(sc: SparkContext, args: Array[String]): Unit = {
     val ssc = new StreamingContext(sc, Seconds(1)) //create the streaming context with mini-batch of 1 seconds
     val timeRun: Long = args(7).toLong
-    val tweetsDownload = downloadTweet(ssc, args, args(4)).filter(_.getLang() == "en")
-    val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
-      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-      .map(t => TweetCompute.TweetComputeSample(t._2)) //crea la struttura del tweet
+    val tweetsDownload = downloadTweet(ssc, args, args(4) + "HashtagRun").filter(_.getLang() == "en")
+    val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))
+      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //delete tweet repetitions
+      .map(t => TweetCompute.TweetComputeSample(t._2)) //it create the structure of the tweet in our code
       .persist()
 
     tweetEdit.foreachRDD(p => p.foreach(t => for (y <- t._1) {
@@ -115,46 +110,30 @@ object ScalaTweetAnalysis7 {
   }
 
   /** todo
-    * Esegue il download dei tweet applicando o meno un filtro indicante gli hashtag che devono essere presenti nei tweet scaricati
+    * Download the tweets appling a filter, if there is one, based on the hashtags that we want to be present in the tweets we download
     *
-    * @param ssc        viene passato alla funzione lo StreamingContext
-    * @param args       viene passato alla funzione l'array con gli argomenti di input al programma
-    * @param pathInput viene passato alla funzione l'array contenente l'elenco degli hashtag che devono essere presenti nei tweet scaricati
+    * @param ssc        Streaming context
+    * @param args       the input parameters of the main
+    * @param pathFilter viene passato alla funzione l'array contenente l'elenco degli hashtag che devono essere presenti nei tweet scaricati
     * @return
     */
-  private def downloadTweet(ssc: StreamingContext, args: Array[String], pathInput: String): ReceiverInputDStream[Status] = {
-    //leggo dai parametri passati dall'utente le 4 chiavi twitter
+  private def downloadTweet(ssc: StreamingContext, args: Array[String], pathFilter: String): ReceiverInputDStream[Status] = {
+    //read from the parameters the 4 keys needed have access to the twitter API to download tweets
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
-    var filters = extractFilter(pathInput)
-    //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso e le Info dell'Api
-    val confBuild = new ConfigurationBuilder
+    var filters = readFile(pathFilter).map(t => " " + t + " ")
+    val confBuild = new ConfigurationBuilder //configuration of the tweets request
     confBuild.setDebugEnabled(true)
       .setOAuthConsumerKey(consumerKey)
       .setOAuthConsumerSecret(consumerKeySecret)
       .setOAuthAccessToken(accessToken)
       .setOAuthAccessTokenSecret(accessTokenSecret)
-      .setTweetModeExtended(true)
+      .setTweetModeExtended(true) //to receive the full text of tweets longer than 144 chars
       .setIncludeMyRetweetEnabled(false)
       .setUserStreamRepliesAllEnabled(false)
-    val authorization = new OAuthAuthorization(confBuild.build) //crea struttura di autenticazione
+    val authorization = new OAuthAuthorization(confBuild.build)
 
-    //crea lo stream per scaricare i tweet applicando o meno un filtro
+    //create and return the DStream to download the tweets with the filters if they are present
     if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
-  }
-
-  /**todo
-    * Estrae gli hashtag da usare durante il download
-    *
-    * @param path il path seguito dal nome del file su cui andare a leggere il file
-    * @return array con i filtri per il download
-    */
-  private def extractFilter(path: String): Array[String] = {
-    var filters = readFile(path + "HashtagRun")
-    filters = filters ++ readFile(path + "hashtag")
-    if(filters.length> thresholdFilters){
-      filters=filters.take(thresholdFilters)
-    }
-    filters.map(t => " " + t + " ")
   }
 
   /** todo
@@ -224,11 +203,9 @@ object ScalaTweetAnalysis7 {
     * @return lista dei top hashtag estratti
     */
   private def getTopHashtag(percent: Int): String = {
+    val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
     var topHashtag = ""
-    if(hashtagCounterMap.size>0){
-      val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
-      for (i <- 0 to orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
-    }
+    for (i <- 0 to orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
     topHashtag
   }
 

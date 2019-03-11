@@ -83,24 +83,20 @@ object ScalaTweetAnalysis7 {
     }
   }
 
-  /** todo
-    * Setta il contesto di streaming e invoca il dawload dei tweet, in seguito ne esegue la computazione estraendo
-    * per ogni tweet il sentimento e l'insieme degli hashtag presenti
-    * Successivamente popola le 3 strutture dati precedentemente descritte, ovvero:
-    * hashtagCounterMap
-    * hashtagSentimentMap
-    * edgeMap
+  /**
+    *  Set the context of streaming and ask for the downloads of the tweets, then it do computations on the tweet, extracting the sentiment of the tweets
+    *  and the set of the hashtags present in them. After it fill the maps hashtagCounterMap, hashtagSentimentMap, hashtagSentimentMap and edgeMap.
     *
-    * @param sc   viene passato alla funzione lo SparkContext
-    * @param args viene passato alla funzione l'array con gli argomenti di input al programma
+    * @param sc   the SparkContext
+    * @param args the input parameters of the main
     */
   def downloadComputeTweet(sc: SparkContext, args: Array[String]): Unit = {
     val ssc = new StreamingContext(sc, Seconds(1)) //create the streaming context with mini-batch of 1 seconds
     val timeRun: Long = args(7).toLong
     val tweetsDownload = downloadTweet(ssc, args, args(4)).filter(_.getLang() == "en")
-    val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText)) //coppie (t._1, t._2) formate dall'intero tweet (_1) e il suo testo (_2)
-      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //elimina ripetizione tweet
-      .map(t => TweetCompute.TweetComputeSample(t._2)) //crea la struttura del tweet
+    val tweetEdit = tweetsDownload.map(t => (t, if (t.getRetweetedStatus != null) t.getRetweetedStatus.getText else t.getText))
+      .groupByKey().map(t => (t._1, t._2.reduce((x, y) => x))) //delete the repetitions of tweets
+      .map(t => TweetCompute.TweetComputeSample(t._2)) //create the structure of the tweets used in the code
       .persist()
 
     tweetEdit.foreachRDD(p => p.foreach(t => for (y <- t._1) {
@@ -114,39 +110,38 @@ object ScalaTweetAnalysis7 {
     ssc.stop(true, true)
   }
 
-  /** todo
-    * Esegue il download dei tweet applicando o meno un filtro indicante gli hashtag che devono essere presenti nei tweet scaricati
+  /**
+    * Download of the tweets with the application of a filter, if present, on the hashtags that must be present on the tweets downloaded
     *
-    * @param ssc        viene passato alla funzione lo StreamingContext
-    * @param args       viene passato alla funzione l'array con gli argomenti di input al programma
-    * @param pathInput path file input
+    * @param ssc        Streaming context
+    * @param args       the input parameters of the main
+    * @param pathInput  path of the file in input
     * @return
     */
   private def downloadTweet(ssc: StreamingContext, args: Array[String], pathInput: String): ReceiverInputDStream[Status] = {
-    //leggo dai parametri passati dall'utente le 4 chiavi twitter
+    //read from the parameters the 4 key needed to downlaod tweets from the twitter API
     val Array(consumerKey, consumerKeySecret, accessToken, accessTokenSecret) = args.take(4)
     var filters = extractFilter(pathInput)
-    //crea la variabile di configurazione della richiesta popolandola con le chiavi di accesso e le Info dell'Api
     val confBuild = new ConfigurationBuilder
     confBuild.setDebugEnabled(true)
       .setOAuthConsumerKey(consumerKey)
       .setOAuthConsumerSecret(consumerKeySecret)
       .setOAuthAccessToken(accessToken)
       .setOAuthAccessTokenSecret(accessTokenSecret)
-      .setTweetModeExtended(true)
+      .setTweetModeExtended(true) //it allow to download the full text of tweets with more than 144 chars
       .setIncludeMyRetweetEnabled(false)
       .setUserStreamRepliesAllEnabled(false)
-    val authorization = new OAuthAuthorization(confBuild.build) //crea struttura di autenticazione
+    val authorization = new OAuthAuthorization(confBuild.build)
 
-    //crea lo stream per scaricare i tweet applicando o meno un filtro
+    //Create the DStream that receives the downloaded filtered, if there are filters, tweets
     if (filters.length > 0) TwitterUtils.createStream(ssc, Some(authorization), filters) else TwitterUtils.createStream(ssc, Some(authorization))
   }
 
-  /**todo
-    * Estrae gli hashtag da usare durante il download
+  /**
+    * Extract the hashtags we want to add in the filter
     *
-    * @param path il path dei file di input
-    * @return array con i filtri per il download
+    * @param path the path of the file in input
+    * @return array with the filters for the download
     */
   private def extractFilter(path: String): Array[String] = {
     var filters = readFile(path + "HashtagRun")
@@ -157,11 +152,12 @@ object ScalaTweetAnalysis7 {
     filters.map(t => " " + t + " ")
   }
 
-  /** todo
+  /**
     * Serializza in un file una mappa applicando una codifica personalizzata del tipo chiave=valore
+    * Serialize in a file a map appling a personalized encoding of the type key-value
     *
-    * @param pathFilename il path seguito dal nome del file su cui salvare la serializzazione
-    * @param mapSerialize rappresenta la mappa da serializzare, la quale deve avere come chiave una Stringa e come valore un Intero
+    * @param pathFilename path of the file, including the file name itself on which to save the serialization
+    * @param mapSerialize map to serialize
     */
   private def serializeMap(pathFilename: String, mapSerialize: Map[String, Int]): Map[String, Int] = {
     var mapToSerialize = mapSerialize
@@ -181,10 +177,10 @@ object ScalaTweetAnalysis7 {
     writeFile(filename, "")
   }
 
-  /** todo
-    * Tale funzione ci permette di leggere un file indipendentemente dal file system istanziato sulla macchina che la invoca
+  /**
+    * Function to read a file independently from the file system present on the machine that invokes it
     *
-    * @param pathFilename il path seguito dal nome del file su cui andare a leggere il file
+    * @param pathFilename path of the file, including the file name itself
     * @return
     */
   private def readFile(pathFilename: String): Array[String] = {
@@ -201,11 +197,11 @@ object ScalaTweetAnalysis7 {
     textFile.split("\n")
   }
 
-  /** todo
-    * Tale funzione ci permette di scrivere un file indipendentemente dal file system istanziato sulla macchina che la invoca
+  /**
+    * Function to write a file independently from the file system present on the machine that invokes it
     *
-    * @param pathFilename il path seguito dal nome del file su cui scrivere
-    * @param text         testo da scrivere sul file
+    * @param pathFilename ath of the file, including the file name itself on which we want to write
+    * @param text         text we want to write on the file
     */
   private def writeFile(pathFilename: String, text: String): Unit = {
     val hadoopPath = new Path(pathFilename)
@@ -217,26 +213,25 @@ object ScalaTweetAnalysis7 {
     wrappedStream.close()
   }
 
-  /** todo
-    * Tale funzione estrae la percentuale X più siglificativa dell'insieme di hashtag rilevati e la restituisce in output
+  /**
+    * Extract the percent X most meaningful of the set of hashtag found (based on the number of tweets in which the hashtag is present) and gives it in output
     *
-    * @param percent percentuale di hashtag da estrarre
-    * @return lista dei top hashtag estratti
+    * @param percent percent of hashtags to extract
+    * @return list of the top hashtags extracted
     */
   private def getTopHashtag(percent: Int): String = {
     var topHashtag = ""
-    if(hashtagCounterMap.size>0){
+    if(hashtagCounterMap.size > 0) {
       val orderHashtag = hashtagCounterMap.toSeq.sortWith(_._2 > _._2).map(t => t._1).toArray
       for (i <- 0 to orderHashtag.length * percent / 100) topHashtag += orderHashtag(i) + "\n"
     }
     topHashtag
   }
 
-  /** todo vedi te di scriverlo meglio ma è quello che fà
-    * genera e successivamente salva su file i dataset contenenti i dati per la visualizzazione del
-    * grafo e del bubbleChart rappresentanti i le analisi eseguite sui tweet
+  /**
+    * Create and save on file the data needed for the graphic visualization of the the graph and of the bubble chart
     *
-    * @param pathOutput path di output dei file generati dalla funzione
+    * @param pathOutput path of the files created by graphComputation
     */
   private def graphComputation(pathOutput: String): Unit = {
     val numberHashtag = hashtagCounterMap.size
@@ -277,5 +272,3 @@ object ScalaTweetAnalysis7 {
     writeFile(pathOutput + "datiGraph.js", textGraph)
   }
 }
-
-//todo toglilo per ultimo altrimenti non rileva gli altri todo, almeno a me era così

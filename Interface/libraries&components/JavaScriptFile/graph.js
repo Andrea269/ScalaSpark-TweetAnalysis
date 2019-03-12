@@ -18,6 +18,7 @@ app.controller('graphController', function ($scope, graphService) {
     };
 
     $scope.load = function () {
+        var epsilon= 500;
         d3.select("#d3matrix").select("svg").remove();
         var loadDialog = document.getElementById("loading");
         loadDialog.showModal();
@@ -42,8 +43,8 @@ app.controller('graphController', function ($scope, graphService) {
                     links.push({source: x, target: y, weight: link.weight});
                 }
             });
-            var width = 960,
-                height = 1000;
+            var width = 10000,
+                height = 10000;
 
             var color = d3.scale.ordinal()
                 .domain(["1", "2", "3", "4", "5"])
@@ -112,6 +113,8 @@ app.controller('graphController', function ($scope, graphService) {
             });
 
             $scope.viewResult = "active";
+            document.getElementById("d3matrix").scrollTop=(height/2)-epsilon;
+            document.getElementById("d3matrix").scrollLeft=(width/2)-epsilon;
         }else{
             $scope.viewResult = null;
         }

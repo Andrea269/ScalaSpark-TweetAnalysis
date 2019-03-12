@@ -58,13 +58,16 @@
     <div id="resultScroll"></div>
     <!--<div id="resultScroll"></div>-->
     <div class="row">
-        <div class="col-sm-9 text-left">
+        <div class="col-sm-9 text-left" style="padding: 3%">
             <div ng-hide="viewResult">
                 <div class="demo">
                     <h1>Threshold too high</h1><br>
                 </div>
             </div>
-            <div id="d3matrix" align="center" ng-show="viewResult"></div>
+            <div class="styled3matrix" id="d3matrix" align="center" ng-show="viewResult">
+
+            </div>
+            <br><br><br><br>
         </div>
         <div class="col-sm-3">
             Very Positive
@@ -94,9 +97,6 @@
                 </button>
             </form>
         </div>
-        <br>
-        <br>
-        <br>
         <footer class="container-fluid text-center navbar-fixed-bottom">
 
             Project made by:<br>

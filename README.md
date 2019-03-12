@@ -10,6 +10,9 @@ The project is dedicated to the analysis of the hashtags in the tweets through s
 , accessTokenSecret. To get them you need to register a developer account on twitter and create an app.
 * The code can be executed using the Google Cloud Platform
 * Be connected to internet to be able to download the tweets
+* create the jar file of the project using "sbt assembly"
+* upload the jar file and the files of the "input" folder into a GCP bucket
+* change the filters of the file "hashtagRun" as desired, writing the hashtags you would like to analyse
 
 ##Usage
 To execute the program we make available the file "RunCloud.sh". In this file there are the following variables that need to be modified.
@@ -24,8 +27,4 @@ To execute the program we make available the file "RunCloud.sh". In this file th
  * PERCENT: a percent number used to make the cutoff of the hashtags to be used in the successive run
  * SCALA_JAR_FILENAME: the name of the jar with the code and all the dependencies 
 
-To use the Google Cloud Platform, using the command "sby assembly" from the project directory, it is possibile  
-
-After entering the keys you can also pass a set of strings representing the filters to be applied to the download of the tweets, continuing to separate the parameters with a tab
-
-
+Using the Cloud Shell on GCP it possible to execute the RunCloud file.

@@ -12,7 +12,7 @@ ACCESS_TOKEN_SECRET="liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6"
 
 PATH_INPUT="gs://bucket-twitter/input/"
 PATH_OUTPUT="gs://bucket-twitter/output/"
-TIME_RUN=15000 # duration in milliseconds of each run
+TIME_RUN=600000 # duration in milliseconds of each run
 PERCENT=30 # percent of hashtags to extract in the successive run, based on the number of tweets in which the hashtag is present
 
 SCALA_JAR_FILENAME=twitterAnalysis.jar

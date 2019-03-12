@@ -1,22 +1,27 @@
 #!/bin/bash
 RUN_SESSION=20181122114000
 
-LOCAL_OUTPUT_PATH="/home/intersect/Desktop/localCloud"
-NUM_RUN_TYPE1=2
+# variables to be modified by the user
+NUM_RUN_TYPE1=2 # number of run minus 1
+
+# twitter keys
 CONSUMER_KEY="efTcZmWVuIOC9gncfFBb4Fnav"
 CONSUMER_KEY_SECRET="SeCYzOYN3Azy3q24aSXauVAl4cHEqPaUt3vDHQF9OmIeQAWBqa"
 ACCESS_TOKEN="1073515508593541120-ykHDZFiyascCGAcU1YX001SySnJYOR"
 ACCESS_TOKEN_SECRET="liSyTQvHBzlgZQ5vq9KpeJFsyYv6LhrbyJKOpReYGfdP6"
+
 PATH_INPUT="gs://bucket-twitter/input/"
 PATH_OUTPUT="gs://bucket-twitter/output/"
-TIME_RUN_TYPE1=15000
-TIME_RUN_TYPE2=10000
-PERCENT=30
+TIME_RUN=15000 # duration in milliseconds of each run
+PERCENT=30 # percent of hashtags to extract in the successive run, based on the number of tweets in which the hashtag is present
+
+SCALA_JAR_FILENAME=twitterAnalysis.jar
+# end of variables to be modifed by the user
+
 
 GCP_PROJECT=mytweetanalysis2
 GCS_SRC_BUCKET_NAME=bucket-twitter
 
-SCALA_JAR_FILENAME=twitterProva.jar
 SCALA_JAR_FILE=codebase/target/scala-2.11/${SCALA_JAR_FILENAME}
 SCALA_JAR_FILE_LOCALPATH=file://$(pwd) 
 SCALA_RUNNABLE_CLASS=ScalaTweetAnalysis7
@@ -42,12 +47,12 @@ echo "==========================================================================
 for i in $(seq 1 $NUM_RUN_TYPE1); do
 
 echo "===================================================================================="
-echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
+echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
 echo "===================================================================================="
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- ${CONSUMER_KEY} ${CONSUMER_KEY_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET} ${PATH_INPUT} ${PATH_INPUT} TypeRun1 ${TIME_RUN_TYPE1} ${PERCENT}
+      -- ${CONSUMER_KEY} ${CONSUMER_KEY_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET} ${PATH_INPUT} ${PATH_INPUT} TypeRun1 ${TIME_RUN} ${PERCENT}
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
@@ -56,12 +61,12 @@ done
 
 #run job Type 2
 echo "===================================================================================="
-echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' OVER '${DATA_FILE}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
+echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"RUNNING SPARK JOB '${SCALA_RUNNABLE_CLASS}' DATA FILE ON '${DATAPROC_CLUSTER_NAME}' CLUSTER ..."
 echo "===================================================================================="
 gcloud dataproc jobs submit spark --cluster ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_CLUSTER_REGION} \
       --class ${SCALA_RUNNABLE_CLASS} \
       --jars ${SCALA_JAR_FILE_FOR_JOB_SUBMIT} \
-      -- ${CONSUMER_KEY} ${CONSUMER_KEY_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET} ${PATH_INPUT} ${PATH_OUTPUT} TypeRun2 ${TIME_RUN_TYPE2} ${PERCENT}
+      -- ${CONSUMER_KEY} ${CONSUMER_KEY_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET} ${PATH_INPUT} ${PATH_OUTPUT} TypeRun2 ${TIME_RUN} ${PERCENT}
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"SPARK JOB '${SCALA_RUNNABLE_CLASS}' DONE!"
 echo "===================================================================================="
@@ -76,10 +81,3 @@ gcloud dataproc clusters delete -q ${DATAPROC_CLUSTER_NAME} --region ${DATAPROC_
 echo "===================================================================================="
 echo "$(date +"%d/%m/%Y - %H:%M:%S") - "+"CLUSTER '${DATAPROC_CLUSTER_NAME}' DELETED!"
 echo "===================================================================================="
-
-
-#needs to give permission to download a file locally from a bucket
-#download output
-#echo "downloading output"
-#gsutil cp gs://bucket-twitter/output/* ${LOCAL_OUTPUT_PATH}
-#echo "end of everything"

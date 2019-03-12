@@ -181,7 +181,7 @@ object ScalaTweetAnalysis7 {
     * Function to read a file independently from the file system present on the machine that invokes it
     *
     * @param pathFilename path of the file, including the file name itself
-    * @return
+    * @return array in which a element is a row of the file
     */
   private def readFile(pathFilename: String): Array[String] = {
     val hadoopPath = new Path(pathFilename)

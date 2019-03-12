@@ -30,7 +30,7 @@ object TweetCompute {
     */
   def TweetComputeSample(textT: String): (Array[String], Int) = {
     val sentimentTweet: Int = if (textT != null && textT != " ") computesSentiment(cleanText(textT.toString)) else 3 //To an empty string the neutral sentiment value is assigned
-    println(textT) //Print the text of the tweet under computation
+    println("\n" + textT + "\n") //Print the text of the tweet under computation
     (extractHashtags(textT.toString), sentimentTweet)
   }
 

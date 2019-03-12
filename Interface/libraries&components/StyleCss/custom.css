@@ -121,6 +121,16 @@ p.error{
     color: red;
 }
 
+div.styled3matrix{
+    border-width:1px;
+    border-style:solid;
+    border-color:black;
+    height: 700px;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
 /*D3 Style*/
 .verypositive {
     width:20px;
@@ -187,3 +197,4 @@ p.error{
 .node:active .text2 {
     display: inline;
 }
+

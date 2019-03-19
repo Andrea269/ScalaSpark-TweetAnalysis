@@ -17,9 +17,9 @@ app.controller('bubbleChartController', function ($scope, bubbleChartService) {
     };
 
     $scope.load = function () {
-        d3.select("#d3matrix").select("svg").remove();
         var loadDialog = document.getElementById("loading");
         loadDialog.showModal();
+        d3.select("#d3matrix").select("svg").remove();
 
         var temp = [];
         dataset.children.forEach(function (node) {

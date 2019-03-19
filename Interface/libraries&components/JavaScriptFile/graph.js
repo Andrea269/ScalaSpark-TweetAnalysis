@@ -3,17 +3,21 @@ app = angular.module('graphApp', []);
 app.controller('graphController', function ($scope, graphService) {
     $scope.viewResult = null;
     $scope.minLink = 1;
-    $scope.errorInput = null;
+    $scope.minDistance = 150;
+    $scope.errorInputEdge = null;
+    $scope.errorInputDistance = null;
 
 
     $scope.sendInfo = function () {
         var numLink = document.getElementById("linkThreshold").value;
-        if (numLink>0) {
+        var distanceThreshold = document.getElementById("distanceThreshold").value;
+        if (numLink>0 && distanceThreshold>0) {
             $scope.errorInput = null;
             $scope.minLink = numLink;
+            $scope.minDistance = distanceThreshold;
             $scope.load();
         }else{
-            $scope.errorInput = "Inserire un numero maggiore di 0";
+            $scope.errorInput = "Insert a number greater than 0";
         }
     };
 
@@ -52,7 +56,7 @@ app.controller('graphController', function ($scope, graphService) {
 
             var force = d3.layout.force()
                 .gravity(.05)
-                .distance(150)
+                .distance($scope.minDistance)
                 .charge(-100)
                 .size([width, height]);
 
@@ -91,6 +95,12 @@ app.controller('graphController', function ($scope, graphService) {
                 .text(function (d) {
                     return d.name
                 });
+
+            node.append("title")
+                .text(function (d) {
+                    return d.name;
+                });
+
 
             force.on("tick", function () {
                 link
